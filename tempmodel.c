@@ -37,13 +37,12 @@ short add_point(temp_point **tree, char *id, float mass, float damping, vector p
 	temp_point *p = *tree;
 	while (p != NULL) {
 		short c = strcmp(p->pt_id, id);
-		switch (c) {
-			case -1: tree = &(p->left);
-				break;
-			case 1: tree = &(p->right);
-				break;
-			case 0: return 0;
-		}
+		if (c == 0)
+			return 0;
+		if (c < 0)
+			tree = &(p->left);
+		else
+			tree = &(p->right);
 		p = *tree;
 	}
 	*tree = mktPt(id, mass, damping, pos);
@@ -63,17 +62,15 @@ void treemunch(temp_point *tree) {
 }
 
 temp_point *find_pt(temp_point *tree, char *id) {
+	int i;
 	while (tree != NULL) {
-		switch (strcmp(tree->pt_id, id)) {
-			case -1:
-				tree = tree->left;
-				break;
-			case 1:
-				tree = tree->right;
-				break;
-			case 0:
-				return tree;
-		}
+		i = strcmp(tree->pt_id, id);
+		if (i == 0)
+			return tree;
+		if (i < 0)
+			tree = tree->left;
+		else
+			tree = tree->right;
 	}
 	return NULL;
 }
@@ -107,8 +104,10 @@ temp_spring *add_spring(temp_point *tree, temp_spring *existing, char *idA, char
 
 void listmunch(temp_spring *s) {
 	temp_spring *next;
-	while ((next = s->next))
-		free(s);
+	if (s != NULL) {
+		while ((next = s->next))
+			free(s);
+	}
 }
 
 unsigned int tree_items(temp_point *tree) {
@@ -120,7 +119,7 @@ unsigned int tree_items(temp_point *tree) {
 	return counter;
 }
 
-unsigned int mk_fast_pts(temp_point *tree, point *pts, unsigned int i) {
+static unsigned int mk_fast_pts(temp_point *tree, point *pts, unsigned int i) {
 	unsigned int j;
 	if (tree->left != NULL)
 		i = mk_fast_pts(tree->left, pts, i);
@@ -153,7 +152,6 @@ model convert(temp_point *tree, temp_spring *springlist) {
 	model m = mkmodel();
 	unsigned int s, i;
 	spring *sp;
-	temp_spring *next;
 	s = tree_items(tree);
 	m.pts->no = s;
 	m.pts->pts = (point*) calloc(s, sizeof(point));
@@ -171,11 +169,8 @@ model convert(temp_point *tree, temp_spring *springlist) {
 		(sp[i]).b_no = springlist->connection_no_b;
 		//make the occasional use vector
 		(sp[i]).v = Vmk();
-		//advance through the list and remove temp springs
-		next = springlist->next;
-		free(springlist);
-		springlist = next;
+		//advance through the list
+		springlist = springlist->next;
 	}
-	treemunch(tree);
 	return m;
 }

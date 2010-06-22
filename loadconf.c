@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include "vectors.h"
 
-char *get_line(FILE *f) {
+static char *get_line(FILE *f) {
 	//read one line from the file f, returns a string, unless the end of file is reached, in which case returns NULL
 	int c = fgetc(f);
 	char_list *head = NULL, *tail;
@@ -26,8 +26,9 @@ char *get_line(FILE *f) {
 	return clconvert(head); //to a C style string
 }
 
-line_list *readfile(char *path) { //attach line nos so the errors are easier to find
+line_list *readfile(const char * const path) { //attach line nos so the errors are easier to find
 	//returns a line_list containing all valid data from the file, returns NULL if the file cannot be opened or there is no data in the file
+	unsigned int lineno = 1;
 	FILE *f = fopen(path, "r");
 	line_list *head, *tail;
 	head = tail = NULL;
@@ -36,21 +37,23 @@ line_list *readfile(char *path) { //attach line nos so the errors are easier to 
 		return NULL;
 	line = get_line(f);
 	while (line != NULL) {
+		lineno++;
 		if (strlen(line) == 0) { //do not add empty lines
 			free(line);
 			line = get_line(f);
 		}
 		else {
-			head = tail = llmk(line);
+			head = tail = llmk(line, lineno);
 			line = get_line(f);
 			break;
 		}
 	}
 	while (line != NULL) {
+		lineno++;
 		if (strlen(line) == 0)
 			free(line);
 		else
-			tail = llappend(tail, line);
+			tail = llappend(tail, line, lineno);
 		line = get_line(f);
 	}
 	fclose(f);
@@ -79,7 +82,7 @@ char *get_word(const char *str, unsigned int *pos) {
 	return clconvert(cl);
 }
 
-short is_float_char(char c) {
+static short is_float_char(char c) {
 	switch (c) {
 		case '.':
 		case '-':
@@ -94,7 +97,7 @@ short is_float_char(char c) {
 	return 1;
 }
 
-vector read_vector(char *line, unsigned int *pos) {
+vector read_vector(const char *line, unsigned int *pos) {
 	unsigned int i, start, d;
 	vector v = Vmk();
 	i = *pos;

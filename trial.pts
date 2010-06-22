@@ -6,7 +6,3 @@ p badboy (1.0, 0.5) 1.0 0.8
 s anvil badboy 0.8 1.0
 p car (2.0, 0.0) inf 1.0
 s badboy car 0.8 1.0
-
-c one simple_inv_sq {
-	scale 1.0
-}

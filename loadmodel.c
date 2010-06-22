@@ -37,7 +37,7 @@ unsigned int pts_sp(line_list *head, temp_point **tree, temp_spring **sp) { //re
 				case 'p': //points
 					str = get_word(head->str, &i);
 					if (str == NULL) {
-						printf("point unamed\n");
+						printf("line %i: point unamed\n", head->lineno);
 						return 0;
 					}
 					v = read_vector(head->str, &i);
@@ -113,7 +113,9 @@ model fileload(char *path) {
 	no_nodes = pts_sp(ll, &tree, &springs); //initial pass for relationships
 	no_springs = listlen(springs);
 	if (no_springs && no_nodes)
-		return convert(tree, springs); //could make use of knowing springs and node numbers, since this works it out again
+		m = convert(tree, springs); //could make use of knowing springs and node numbers, since this works it out again
+		listmunch(springs);
+		treemunch(tree);
 	else {
 		printf("%s\n", "no nodes or no springs defined");
 		treemunch(tree);

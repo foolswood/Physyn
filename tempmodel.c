@@ -105,8 +105,10 @@ temp_spring *add_spring(temp_point *tree, temp_spring *existing, char *idA, char
 void listmunch(temp_spring *s) {
 	temp_spring *next;
 	if (s != NULL) {
-		while ((next = s->next))
+		while ((next = s->next)) {
 			free(s);
+			s = next;
+		}
 	}
 }
 

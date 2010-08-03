@@ -2,25 +2,28 @@
 #include "../loadconf.h"
 #include "../ptrlist.h"
 #include "../tempmodel.h"
+#include "../vectors.h"
+#include "plugin_header.h"
 
 typedef struct mic {
 	const vector v; //the velocity vector to watch
 	const float scale; //multiplier to allow scaling of the output (like an internal gain slider) to get it within the range
-	float (*get) (struct mic m); //call this to get the output
 } mic;
 
-static float mic_out(const mic m) { //get the output from the microphone
-	return Vmodulus(m.v);
+static float mic_out(const void* m) { //get the output from the microphone
+	return Vmodulus(((mic) m)i->v);
 }
 
-static inline mic *mk_mic(const vector v, const float scale) {
+static inline capture_device *mk_cd(const vector v, const float scale) {
 	mic *p = malloc(sizeof(mic));
-	mic m = {v, scale, &mic_out};
+	capture_device *c = malloc(sizeof(capture_device));
+	mic m = {v, scale};
 	memcpy(p, &m, sizeof(mic));
-	return p;
+	c = {&mic_out, p};
+	return c;
 }
 
-mic *init(line_list *head, temp_point *tree) { //read a section of the config file to get the data to initialize the mic
+capture_device *init(line_list *head, model mdl, temp_point *tree) { //read a section of the config file to get the data to initialize the mic
 	float s;
 	unsigned int i = 0;
 	char *w = get_word(head->str, &i);
@@ -35,5 +38,5 @@ mic *init(line_list *head, temp_point *tree) { //read a section of the config fi
 		free(w);
 		return 0;
 	}
-	return mk_mic(tree->fast->v, s);
+	return mk_cd(tree->fast->v, s);
 }

@@ -4,14 +4,17 @@
 
 unsigned int dimensions; //const - this is for the benifit of the header generator
 
-void set_dimensions(unsigned int i) {
+short set_dimensions(unsigned int i) {
 	static int runbefore;
 	if (!runbefore) {
 		dimensions = i;
 		runbefore = 1;
 	}
-	else
-		printf("Shan't! (you tried to set the dimensions twice, bad dev)\n");
+	else {
+		printf("Shan't! (you tried to set the dimensions twice, bad)\n");
+		dimensions = 0;
+	}
+	return dimensions;
 }
 
 typedef float* vector;

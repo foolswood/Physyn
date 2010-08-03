@@ -5,17 +5,34 @@
 #include "model.h"
 #include "tempmodel.h"
 #include "loadconf.h"
+#include "capture.h"
 
-void get_dimensions(line_list *head) {
+void get_dimensions(line_list **hd) { //improve error messages
 	unsigned int i;
 	char *str;
+	line_list *nxt, *head = *hd;
 	while (head != NULL) {
 		i = 0;
 		str = get_word(head->str, &i);
 		if (str != NULL) {
 			if (!strcmp(str, "dimensions")) {
-				if (sscanf((head->str)+i, "%i", &i));
-					set_dimensions(i);
+				if (sscanf((head->str)+i, "%i", &i)) {
+					if (set_dimensions(i)) {
+						if (head->prev == NULL) {
+							*hd = nxt = head->next;
+						}
+						else {
+							(head->prev)->next = head->next;
+							nxt = head->next;
+							(nxt)->prev = head->prev;
+						}
+						free((char*) head->str);
+						free(head);
+						head = nxt;
+						if (head == NULL)
+							break;
+					}
+				}
 			}
 			free(str);
 		}
@@ -93,6 +110,23 @@ unsigned int pts_sp(line_list *head, temp_point **tree, temp_spring **sp) { //re
 					free(str2);
 					*sp = next_spring;
 					break;
+				case 'c': //capture devices
+					i = 22;
+					line_list *antichrist, *testing;
+					printf("%i\n", extract_curly_braces(&head, &testing, &i));
+					antichrist = head;
+					printf("split from:\n");
+					while (antichrist != NULL) {
+						printf("%s\n", antichrist->str);
+						antichrist = antichrist->next;
+					}
+					register_capture(testing);
+					printf("split to:\n");
+					while (testing != NULL) {
+						printf("%s\n", testing->str);
+						testing = testing->next;
+					}
+					break;
 			}
 		}
 		head = head->next;
@@ -106,16 +140,15 @@ model fileload(char *path) {
 	temp_spring *springs = NULL;
 	unsigned int no_nodes, no_springs;
 	line_list *ll = readfile(path); //read input file
-	get_dimensions(ll);
-	if (dimensions == 0) {
-		printf("bail");
-	}
+	get_dimensions(&ll);
 	no_nodes = pts_sp(ll, &tree, &springs); //initial pass for relationships
 	no_springs = listlen(springs);
-	if (no_springs && no_nodes)
+	if (no_springs && no_nodes) {
 		m = convert(tree, springs); //could make use of knowing springs and node numbers, since this works it out again
+		init_capture();
 		listmunch(springs);
 		treemunch(tree);
+	}
 	else {
 		printf("%s\n", "no nodes or no springs defined");
 		treemunch(tree);
@@ -125,8 +158,8 @@ model fileload(char *path) {
 		m.pts->pts = NULL;
 		m.s->no = 0;
 		m.s->springs = NULL;
-		return m;
 	}
+	return m;
 }
 
 int main(void) {

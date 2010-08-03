@@ -2,11 +2,10 @@
 
 def curly_brace(iter8r): #finds opposing curly brace
 	bracecount = 0
-	line = i[iter8r]
 	while iter8r < len(i):
+		line = i[iter8r]
 		bracecount = bracecount + line.count('{') - line.count('}')
 		iter8r = iter8r + 1
-		line = i[iter8r]
 		if bracecount == 0:
 			break
 	return iter8r

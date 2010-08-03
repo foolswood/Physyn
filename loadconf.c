@@ -28,7 +28,7 @@ static char *get_line(FILE *f) {
 
 line_list *readfile(const char * const path) { //attach line nos so the errors are easier to find
 	//returns a line_list containing all valid data from the file, returns NULL if the file cannot be opened or there is no data in the file
-	unsigned int lineno = 1;
+	unsigned int lineno = 0;
 	FILE *f = fopen(path, "r");
 	line_list *head, *tail;
 	head = tail = NULL;
@@ -52,8 +52,9 @@ line_list *readfile(const char * const path) { //attach line nos so the errors a
 		lineno++;
 		if (strlen(line) == 0)
 			free(line);
-		else
+		else {
 			tail = llappend(tail, line, lineno);
+		}
 		line = get_line(f);
 	}
 	fclose(f);
@@ -135,4 +136,141 @@ vector read_vector(const char *line, unsigned int *pos) {
 	}
 	free(v);
 	return NULL;
+}
+
+short extract_curly_braces(line_list **hd, line_list **sl, unsigned int * const i) {
+	//hd is the initial list head ptr, sl is for the new list, i is an offset, returns 0 if successful!
+	//for some reason this function is vile, if you can tidy it, do
+	line_list *before, *start, *end, *head = *hd;
+	char c, *str;
+	unsigned int j, bcounter =  1;
+	if (head == NULL)
+		return 4;
+	while (1) { //find 1st bracket
+		c = head->str[*i];
+		if (isspace(c)) {
+			(*i)++;
+		}
+		else {
+			if (c == '{')
+				break;
+			else {
+				if (c == '\0') {
+					head = head->next;
+					if (head == NULL)
+						return 1; //no open bracket
+					(*i) = 0;
+				}
+				else
+					return 2; //something before open bracket
+			}
+		}
+	}
+	if (head == *hd) {
+		j = *i;
+		do {
+			c = head->str[--j];
+		} while (isspace(c));
+		j++;
+		str = calloc(j+1, sizeof(char));
+		strncpy(str, head->str, j*sizeof(char));
+		str[j] = '\0';
+		start = head->next; //guessing ahead at this point
+		before = llappend(head->prev, str, head->lineno);
+		*hd = before;
+		j = *i;
+		do {
+			c = head->str[++j];
+		} while(isspace(c));
+		if (c != '\0') {
+			str = calloc(strlen(head->str)-j, sizeof(char));
+			strncpy(str, (head->str)+j, (strlen(head->str)-j)*sizeof(char));
+			end = llmk(str, head->lineno);
+			end->next = start;
+			start->prev = end;
+			start = end;
+		}
+		else {
+			start->prev = NULL;
+		}
+		free((char*) head->str);
+		free(head);
+	}
+	else {
+		before = *hd;
+		start = head;
+		if (start->prev != before) { //there are blank lines between the call and the open bracket
+			printf("memory leaking here, either fix your wierd ass config file or give me a prod and I'll fix this; fools\n");
+		}
+	}
+	*sl = start;
+	*i = 0;
+	end = start;
+	while (1) {
+		c = end->str[*i];
+		switch (c) {
+			case '{':
+				bcounter++;
+				(*i)++;
+				break;
+			case '}':
+				bcounter--;
+				(*i)++;
+				break;
+			case '\0':
+				end = end->next;
+				*i = 0;
+				if (end == NULL)
+					return 3; //no opposing bracket
+				break;
+			default:
+				(*i)++;
+				break;
+		}
+		if (bcounter == 0)
+			break;
+	}
+	//line with close bracket
+	j = *i;
+	do {
+		c = (end->str)[j++];
+	} while(isspace(c));
+	if (c == '\0') {
+		if (end->next == NULL)
+			before->next = NULL;
+		else {
+			end->next->prev = before;
+			before->next = end->next;
+			end->next = NULL;
+		}
+	}
+	else {
+		j = (*i) + 1;
+		while (isspace((end->str)[j++])) {
+		}
+		str = calloc(strlen(end->str) - j, sizeof(char));
+		strncpy(str, end->str, strlen(end->str) - j - 2);
+		str[strlen(end->str) - j - 2] = '\0';
+		head = llmk(str, end->lineno);
+		head->prev = before;
+		before->next = head;
+		head->next = end->next;
+	}
+	j = (*i) - 1;
+	while (j) {
+		if (!isspace((end->str)[j--])) {
+			str = calloc(j+2, sizeof(char));
+			strncpy(str, end->str, j+1);
+			str[j+1] = '\0';
+			head = llmk(str, end->lineno);
+			end->prev->next = head;
+			head->prev = end->prev;
+			break;
+		}
+	}
+	if (!j)
+		end->prev->next = NULL;
+	free((char*) end->str);
+	free(end);
+	return 0;
 }

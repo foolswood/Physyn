@@ -111,22 +111,11 @@ unsigned int pts_sp(line_list *head, temp_point **tree, temp_spring **sp) { //re
 					*sp = next_spring;
 					break;
 				case 'c': //capture devices
-					i = 22;
-					line_list *antichrist, *testing;
-					printf("%i\n", extract_curly_braces(&head, &testing, &i));
-					antichrist = head;
-					printf("split from:\n");
-					while (antichrist != NULL) {
-						printf("%s\n", antichrist->str);
-						antichrist = antichrist->next;
-					}
-					register_capture(testing);
-					printf("split to:\n");
-					while (testing != NULL) {
-						printf("%s\n", testing->str);
-						testing = testing->next;
-					}
-					break;
+					str = get_word(head->str, &i);
+					str2 = get_word(head->str, &i); //output name (currentyly unused)
+					line_list *device_parameters = NULL;
+					extract_curly_braces(&head, &device_parameters, &i);
+					register_capture(str, device_parameters);
 			}
 		}
 		head = head->next;
@@ -145,7 +134,7 @@ model fileload(char *path) {
 	no_springs = listlen(springs);
 	if (no_springs && no_nodes) {
 		m = convert(tree, springs); //could make use of knowing springs and node numbers, since this works it out again
-		init_capture();
+		init_capture(tree);
 		listmunch(springs);
 		treemunch(tree);
 	}

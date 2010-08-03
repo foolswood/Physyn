@@ -1,6 +1,7 @@
 #include <dlfcn.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "tempmodel.h"
 #include "ptrlist.h"
 #include "capture/plugin_header.h"
 
@@ -38,17 +39,17 @@ void register_capture(char *device, line_list *head) {
 	no_devices++;
 }
 
-short init_capture(void) {
+short init_capture(temp_point *tree) {
 	unsigned short i;
 	char *str;
 	void *libhandle;
 	cdil *nxtdev;
-	void *(*fptr)(void *);
+	void *(*fptr)(line_list*, temp_point*);
 	capdevs = calloc(no_devices, sizeof(capture_device*));
 	for (i=0; i<no_devices; i++) {
 		//create the path string for the capture device file
 		str = calloc(strlen(devices->device)+11, sizeof(char));
-		str = "capture/";
+		strcpy(str, "capture/");
 		strcat(str, devices->device);
 		strcat(str, ".so");
 		//load the capture device
@@ -59,7 +60,7 @@ short init_capture(void) {
 			return 1;
 		}
 		fptr = dlsym(libhandle, "init");
-		capdevs[i] = (*fptr)(devices->ll);
+		capdevs[i] = (*fptr)(devices->ll, tree);
 		//free memory for the initializer and move on to the next one
 		llfree(devices->ll);
 		free(devices->device);

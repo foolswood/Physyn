@@ -10,8 +10,9 @@ typedef struct mic {
 	const float scale; //multiplier to allow scaling of the output (like an internal gain slider) to get it within the range
 } mic;
 
-static float mic_out(const void* m) { //get the output from the microphone
-	return Vmodulus(((mic) m)i->v);
+static float mic_out(const void* ptr) { //get the output from the microphone
+	mic const *m = ptr;
+	return Vmodulus(m->v);
 }
 
 static inline capture_device *mk_cd(const vector v, const float scale) {
@@ -19,11 +20,12 @@ static inline capture_device *mk_cd(const vector v, const float scale) {
 	capture_device *c = malloc(sizeof(capture_device));
 	mic m = {v, scale};
 	memcpy(p, &m, sizeof(mic));
-	c = {&mic_out, p};
+	c->get_output = &mic_out;
+	c->data = p;
 	return c;
 }
 
-capture_device *init(line_list *head, model mdl, temp_point *tree) { //read a section of the config file to get the data to initialize the mic
+capture_device *init(line_list *head, temp_point *tree) { //read a section of the config file to get the data to initialize the mic
 	float s;
 	unsigned int i = 0;
 	char *w = get_word(head->str, &i);

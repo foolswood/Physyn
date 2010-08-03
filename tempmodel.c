@@ -53,9 +53,9 @@ void treemunch(temp_point *tree) {
 	if (tree == NULL)
 		free(tree);
 	else {
-		if (tree->left == NULL)
+		if (tree->left != NULL)
 			treemunch(tree->left);
-		if (tree->right == NULL)
+		if (tree->right != NULL)
 			treemunch(tree->right);
 		free(tree);
 	}

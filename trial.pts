@@ -8,5 +8,6 @@ p car (2.0, 0.0) inf 1.0
 s badboy car 0.8 1.0
 
 c point_velocity out_1 {
+	anvil
 	scale 1.0
 }

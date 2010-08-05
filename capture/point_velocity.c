@@ -10,7 +10,7 @@ typedef struct mic {
 	const float scale; //multiplier to allow scaling of the output (like an internal gain slider) to get it within the range
 } mic;
 
-static float mic_out(const void* ptr) { //get the output from the microphone
+static float mic_out(void* ptr) { //get the output from the microphone
 	mic const *m = ptr;
 	return Vmodulus(m->v);
 }
@@ -20,7 +20,7 @@ static inline capture_device *mk_cd(const vector v, const float scale) {
 	capture_device *c = malloc(sizeof(capture_device));
 	mic m = {v, scale};
 	memcpy(p, &m, sizeof(mic));
-	c->get_output = &mic_out;
+	c->get_output = &mic_out; //eh?
 	c->data = p;
 	return c;
 }

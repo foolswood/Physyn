@@ -6,6 +6,7 @@
 #include "tempmodel.h"
 #include "loadconf.h"
 #include "capture.h"
+#include "out_channels.h"
 
 void get_dimensions(line_list **hd) { //improve error messages
 	unsigned int i;
@@ -46,6 +47,7 @@ unsigned int pts_sp(line_list *head, temp_point **tree, temp_spring **sp) { //re
 	vector v;
 	temp_spring *next_spring;
 	float mass, damping;
+	line_list *device_parameters;
 	no_nodes = 0;
 	do {
 		if (isspace(head->str[1])) {
@@ -111,11 +113,11 @@ unsigned int pts_sp(line_list *head, temp_point **tree, temp_spring **sp) { //re
 					*sp = next_spring;
 					break;
 				case 'c': //capture devices
-					str = get_word(head->str, &i);
-					str2 = get_word(head->str, &i); //output name (currentyly unused)
-					line_list *device_parameters = NULL;
+					str = get_word(head->str, &i); //device type
+					str2 = get_word(head->str, &i); //output port name
+					device_parameters = NULL;
 					extract_curly_braces(&head, &device_parameters, &i);
-					register_capture(str, device_parameters);
+					register_capture(str, create_output(str2), device_parameters);
 			}
 		}
 		head = head->next;
@@ -152,6 +154,7 @@ model fileload(char *path) {
 }
 
 int main(void) {
+	out_init();
 	model m = fileload("trial.pts");
 	return 0;
 }

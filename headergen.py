@@ -45,6 +45,8 @@ for arg in sys.argv[1:]:
 				line = line.split('=')[0]+';'
 			o = o + 'extern '+line+'\n'
 			iter8r = iter8r+1
+		elif line.__contains__('static'):
+			iter8r = iter8r+1
 		#leave remaining stuff in
 		else:
 			o = o + line + '\n'

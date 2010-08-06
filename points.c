@@ -13,7 +13,7 @@ typedef struct pointset {
 	point *pts;
 } pointset;
 
-float frame_time = 1.0;
+float frame_time = 1.0/44100;
 
 point *mk_point(float b, float mass, vector a, unsigned short springs) {
 	vector x = Vheap(a), v = Vmk();

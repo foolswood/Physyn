@@ -152,9 +152,3 @@ model fileload(char *path) {
 	}
 	return m;
 }
-
-int main(void) {
-	out_init();
-	model m = fileload("trial.pts");
-	return 0;
-}

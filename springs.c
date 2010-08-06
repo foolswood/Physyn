@@ -15,11 +15,12 @@ typedef struct springset {
 } springset;
 
 inline void apply_spring(spring *s) {
+	float d;
 	Vsub(s->v, (s->a)->x, (s->b)->x);
-	float d = Vmodulus(s->v);
-	d = (s->k)*(d - s->restlength)/d;
-	Vtimes_scalar((s->a)->F[s->a_no], s->v, d);
-	Vtimes_scalar((s->b)->F[s->b_no], s->v, -d);
+	d = Vmodulus(s->v);
+	d = (s->k)*((d - s->restlength)/s->restlength);
+	Vtimes_scalar((s->a)->F[s->a_no], s->v, -d);
+	Vtimes_scalar((s->b)->F[s->b_no], s->v, d);
 }
 
 void apply_springs(springset *s) {

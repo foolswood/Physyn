@@ -169,6 +169,8 @@ model convert(temp_point *tree, temp_spring *springlist) {
 		(sp[i]).a_no = springlist->connection_no_a;
 		(sp[i]).b = (springlist->b)->fast;
 		(sp[i]).b_no = springlist->connection_no_b;
+		(sp[i]).restlength = springlist->restlength;
+		(sp[i]).k = springlist->k;
 		//make the occasional use vector
 		(sp[i]).v = Vmk();
 		//advance through the list

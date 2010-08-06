@@ -49,7 +49,7 @@ void get_output(void) {
 	for (device_no=0; device_no<no_devices; device_no++) { //this loop is a prime candidate for parallelization
 		output = (capdevs[device_no]->get_output)((void*) capdevs[device_no]->data);
 		while (jack_ringbuffer_write_space(capdevs[device_no]->ringbuf) < sizeof(float)) {
-			usleep(10);
+			usleep(200);
 		}
 		jack_ringbuffer_write(capdevs[device_no]->ringbuf, (char*) &output, sizeof(float));
 	}

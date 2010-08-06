@@ -12,7 +12,7 @@ typedef struct mic {
 
 static float mic_out(void* ptr) { //get the output from the microphone
 	mic const *m = ptr;
-	return Vmodulus(m->v);
+	return Vmodulus(m->v)*m->scale;
 }
 
 static inline capture_device *mk_cd(const vector v, const float scale) {
@@ -20,7 +20,7 @@ static inline capture_device *mk_cd(const vector v, const float scale) {
 	capture_device *c = malloc(sizeof(capture_device));
 	mic m = {v, scale};
 	memcpy(p, &m, sizeof(mic));
-	c->get_output = &mic_out; //eh?
+	c->get_output = &mic_out;
 	c->data = p;
 	return c;
 }
@@ -33,12 +33,12 @@ capture_device *init(line_list *head, temp_point *tree) { //read a section of th
 	if (tree == NULL) {
 		printf("line %i: %s is not a valid point identifier\n", head->lineno, w);
 		free(w);
-		return 0;
+		return NULL;
 	}
 	if (!sscanf((head->str)+i, "%f", &s)) {
 		printf("line %i: invalid scale value\n", head->lineno);
 		free(w);
-		return 0;
+		return NULL;
 	}
 	return mk_cd(tree->fast->v, s);
 }

@@ -16,11 +16,15 @@ short rtloop(model m) {
 
 int main(void) {
 	model m;
-	out_init();
+	unsigned int rate;
+	int i;
 	m = fileload("trial.pts");
+	rate = out_init();
+	if (rate == 0) {
+		return 1;
+	}
 	rtloop(m);
 	jack_go();
-	int i;
 	for (i=0; i<1024; i++) {
 		rtloop(m);
 	}

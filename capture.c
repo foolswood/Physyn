@@ -72,9 +72,10 @@ short init_capture(temp_point *tree) {
 		libhandle = dlopen(str, RTLD_NOW); //might be memory inefficient, but guarantees that no loading can be required during rt operation
 		free(str);
 		if (!libhandle) {
-			printf("error in dlopen(%s)\n%s\n", "point_velocity.so", dlerror());
+			printf("error in dlopen(%s)\n%s\n", str, dlerror());
 			return 1;
 		}
+		//call the device's init function
 		fptr = dlsym(libhandle, "init");
 		capdevs[i] = (*fptr)(devices->ll, tree);
 		capdevs[i]->ringbuf = devices->ringbuf;

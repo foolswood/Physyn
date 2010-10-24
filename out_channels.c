@@ -4,9 +4,12 @@
 
 static jack_client_t *client;
 
-short out_init(void) {
+unsigned int out_init(void) {
+	//creates the jack client and returns the sample rate (0 is error)
 	client = jack_client_open("physyn", JackNoStartServer, NULL);
-	return 0;
+	if (client == NULL)
+		return 0;
+	return (unsigned int) jack_get_sample_rate(client);
 }
 
 typedef struct outport {

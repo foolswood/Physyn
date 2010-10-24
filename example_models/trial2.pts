@@ -16,5 +16,4 @@ p biddy (2.5, 0.0) inf 0.9999
 s car biddy 0.45 2000.0
 
 c point_velocity out_1 {
-	ass 0.03
-}
+	ass 1 0.08

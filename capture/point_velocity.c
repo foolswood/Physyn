@@ -12,7 +12,7 @@ typedef struct mic {
 
 static float mic_out(void* ptr) { //get the output from the microphone
 	mic const *m = ptr;
-	return Vmodulus(m->v)*m->scale;
+	return (*(m->v))*(m->scale);
 }
 
 static inline capture_device *mk_cd(const vector v, const float scale) {
@@ -28,6 +28,8 @@ static inline capture_device *mk_cd(const vector v, const float scale) {
 capture_device *init(line_list *head, temp_point *tree) { //read a section of the config file to get the data to initialize the mic
 	float s;
 	unsigned int i = 0;
+	unsigned short d;
+	int rval;
 	char *w = get_word(head->str, &i);
 	tree = find_pt(tree, w);
 	if (tree == NULL) {
@@ -35,10 +37,19 @@ capture_device *init(line_list *head, temp_point *tree) { //read a section of th
 		free(w);
 		return NULL;
 	}
-	if (!sscanf((head->str)+i, "%f", &s)) {
-		printf("line %i: invalid scale value\n", head->lineno);
+	free(w);
+	w = get_word(head->str, &i);
+	rval = sscanf(w, "%hu", &d);
+	if ((rval != 1) || (d >= dimensions)) {
+		printf("line %i: invalid dimension selection\n", head->lineno); //logic backwards, mustfix
 		free(w);
 		return NULL;
 	}
-	return mk_cd(tree->fast->v, s);
+	free(w);
+	rval = sscanf((head->str)+i, "%f", &s);
+	if (rval != 1) {
+		printf("line %i: invalid scale value\n", head->lineno);
+		return NULL;
+	}
+	return mk_cd(&(tree->fast->v[d]), s);
 }

@@ -1,0 +1,12 @@
+#this is a comment
+dimensions 2
+
+p anvil (0.0, 0.0) inf 1.0
+p badboy (1.0, 1.0) 0.005 0.9999
+s anvil badboy 0.5 1000.0
+p car (2.0, 0.0) inf 1.0
+s badboy car 0.5 1000.0
+
+c point_velocity out_1 {
+	badboy 1 0.001
+}

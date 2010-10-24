@@ -1,0 +1,47 @@
+#this is a comment
+dimensions 3
+
+#outer ring
+p ot (2, 0, 0) inf 1.0
+p otr (4, 1, 0) inf 1.0
+p obr (4, 3, 0) inf 1.0
+p ob (2, 4, 0) inf 1.0
+p obl (0, 3, 0) inf 1.0
+p otl (0, 1, 0) inf 1.0
+
+#middle ring
+p mtl (1.5, 1, 0) 0.01 0.999
+p mtr (2.5, 1, 0) 0.01 0.9991
+p mr (3, 2, 0) 0.01 0.999
+p mbl (1.5, 3, 0) 0.01 0.999
+p mbr (2.5, 3, 0) 0.01 0.999
+p ml (1, 2, 0.25) 0.01 0.999
+
+#center point
+p c (2, 2, 0.5) 0.01 0.9992
+
+#outer springs
+s ot mtl 0.2 1000.0
+s ot mtr 0.2 1000.0
+s otr mtr 0.2 1000.0
+s otr mr 0.2 1000.0
+s obr mr 0.2 1000.0
+s obr mbr 0.2 1000.0
+s ob mbr 0.2 1000.0
+s ob mbl 0.2 1000.0
+s obl mbl 0.2 1000.0
+s obl ml 0.2 1000.0
+s otl ml 0.2 1000.0
+s otl mtl 0.2 1000.0
+
+#inner springs
+s mtl c 0.2 1200.0
+s mtr c 0.2 1200.0
+s mr c 0.2 1200.0
+s mbr c 0.2 1200.0
+s mbl c 0.2 1200.0
+s ml c 0.2 1200.0
+
+c point_velocity out_1 {
+	mbl 0.002
+}

@@ -1,0 +1,20 @@
+#this is a comment
+dimensions 2
+
+p dang (-0.5, 0.0) inf 1.0
+p anvil (0.0, 0.0) 0.001 1.0001
+s dang anvil 0.45 2000.0
+p candle (0.5, 0.0) 0.001 0.9999
+s anvil candle 0.45 1500.0
+p badboy (1.0, 0.01) 0.001 0.9999
+s badboy candle 0.45 1200.0
+p ass (1.5, 0.0) 0.001 0.9999
+s ass badboy 0.45 1300.0
+p car (2.0, 0.01) 0.001 0.9999
+s ass car 0.45 1500.0
+p biddy (2.5, 0.0) inf 0.9999
+s car biddy 0.45 2000.0
+
+c point_velocity out_1 {
+	ass 0.03
+}

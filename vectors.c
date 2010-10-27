@@ -61,6 +61,14 @@ void Vtimes_scalar(vector const a, const vector const b, const float c) {
 	}
 }
 
+float Vdot_product(const vector const a, const vector const b) {
+	float sum = 0.0;
+	unsigned short d;
+	for (d = 0; d < dimensions; d++) {
+		sum += a[d]*b[d];
+	}
+	return sum;
+}
 
 float Vmodulus(const vector const a) {
 	unsigned short d;
@@ -71,7 +79,6 @@ float Vmodulus(const vector const a) {
 	return sqrt(sum);
 }
 
-
 void Vprint(const vector const a) {
 	unsigned short d;
 	for (d = 0; d < dimensions; d++) {
@@ -79,15 +86,3 @@ void Vprint(const vector const a) {
 	}
 	printf("\n");
 }
-
-/*
-int main(void) {
-	float a[] = {1.0, 2.0};
-	float b[] = {3.0, 4.0};
-	add_vectors(a, b);
-	vector_times_scalar(a, 0.5);
-	print_vector(a);
-	printf("%f\n", modulus(b));
-	return 0;
-}
-*/

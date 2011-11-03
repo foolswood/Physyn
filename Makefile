@@ -1,5 +1,9 @@
-physyn : physyn.c capture.o loadmodel.o model.o out_channels.o physyn.o points.o ptrlist.o springs.o tempmodel.o vectors.o capture_plugins
+all : physyn plugins
+
+physyn : physyn.c capture.o loadmodel.o model.o out_channels.o physyn.o points.o ptrlist.o springs.o tempmodel.o vectors.o action_queue.o
 	gcc -Wall -ggdb -rdynamic -lm -ldl `pkg-config --cflags --libs jack` -o physyn *.o
+
+plugins : capture/point_velocity.so
 
 capture.o capture.h : capture.c tempmodel.h ptrlist.h capture/plugin_header.h
 	./headergen.py capture.c
@@ -9,7 +13,7 @@ loadconf.o loadconf.h : loadconf.c ptrlist.h vectors.h
 	./headergen.py loadconf.c
 	gcc -Wall -ggdb -c loadconf.c
 
-loadmodel.o loadmodel.h : loadmodel.c ptrlist.h model.h tempmodel.h loadconf.h capture.h out_channels.h
+loadmodel.o loadmodel.h : loadmodel.c ptrlist.h model.h tempmodel.h loadconf.h capture.h out_channels.h action_queue.h actions.h
 	./headergen.py loadmodel.c
 	gcc -Wall -ggdb -c loadmodel.c
 
@@ -41,15 +45,20 @@ vectors.o vectors.h : vectors.c
 	./headergen.py vectors.c
 	gcc -Wall -ggdb -c vectors.c
 
-capture/plugin_header.h : capture/plugin_header.c
-	./headergen.py capture/plugin_header.c
-	gcc -Wall -ggdb -c capture/plugin_header.c
+action_queue.o action_queue.h : action_queue.c
+	./headergen.py action_queue.c
+	gcc -Wall -ggdb -c action_queue.c
 
-capture_plugins : capture/plugin_header.h
-	cd capture; make
+actions.o actions.h : actions.c action_queue.h ptrlist.h loadconf.h tempmodel.h
+	./headergen.py actions.c
+	gcc -Wall -ggdb -c actions.c
+
+capture/plugin_header.h capture/plugin_header.o : capture/plugin_header.c
+	cd capture; gcc -Wall -ggdb -c plugin_header.c; ../headergen.py plugin_header.c
+
+capture/point_velocity.so : capture/point_velocity.c capture/plugin_header.h loadconf.h ptrlist.h tempmodel.h vectors.h
+	cd capture; gcc -Wall -c -fpic -ggdb point_velocity.c; gcc -shared -Wl,-soname,point_velocity.so -o point_velocity.so point_velocity.o
 
 clean :
-	rm *.o
-	rm *.h
-	rm physyn
-	cd capture; make clean
+	rm *.o *.h physyn
+	cd capture; rm *.so *.o *.h

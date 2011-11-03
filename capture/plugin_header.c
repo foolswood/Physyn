@@ -7,6 +7,7 @@ point **get_all_points(void);
 
 typedef struct capture_device {
 	float (*get_output) (void*);
-	void *data;
 	jack_ringbuffer_t *ringbuf;
+	void *data;
+	void (*free_data) (void*);
 } capture_device;

@@ -61,7 +61,7 @@ void Vtimes_scalar(vector const a, const vector const b, const float c) {
 	}
 }
 
-float Vdot_product(const vector const a, const vector const b) {
+float Vdot(const vector const a, const vector const b) {
 	float sum = 0.0;
 	unsigned short d;
 	for (d = 0; d < dimensions; d++) {

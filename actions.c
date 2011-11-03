@@ -1,77 +1,87 @@
-#include <stdlib.h>
-
-typedef struct actionlist {
-	unsigned short (*act) (void*); //return 0 until it is to be destroyed, then return 1
-	void *data;
-	void (*free_data) (void*);
-	struct actionlist *next;
-} actionlist;
-
-static actionlist *actions = NULL;
-//actually need 3, before forces, after forces but before movement and after movement
-
-void add_action(unsigned short (*act) (void*), void *data, void (*free_data) (void*)) {
-	actionlist *new = malloc(sizeof(actionlist));
-	new->act = act;
-	new->data = data;
-	new->free_data = free_data;
-	new->next = actions;
-	actions = new;
-}
-
-void do_actions(void) {
-	actionlist *acting, *prev;
-	acting = actions;
-	prev = NULL;
-	unsigned short rval;
-	while (acting != NULL) {
-		rval = (acting->act)((void*) acting->data);
-		if (rval) { //destroy the acting action
-			if (prev == NULL) { //first in list :. free memory and move the start of the list on
-				(acting->free_data)((void*) acting->data);
-				acting = actions->next;
-				free(actions);
-				actions = acting;
-			} else { //in middle of list
-				prev->next = acting->next;
-				(acting->free_data)((void*) acting->data);
-				free(acting);
-				acting = prev->next;
-			}
-		} else { //move to the next item
-			prev = acting;
-			acting = acting->next;
-		}
-	}
-}
-
-//Testing Functions
-
+#include "action_queue.h"
+#include "ptrlist.h"
 #include "tempmodel.h"
+#include "loadconf.h"
 
-typedef struct test_data {
-	unsigned short i;
-	vector v, x;
-} test_data;
+typedef struct ail {
+	line_list *ll;
+	char *action;
+	struct ail *next;
+} ail; //action initialization list
 
-static unsigned short testing_samples = 2000;
+static ail *actions = NULL;
 
-unsigned short test_action(void *data) {
-	test_data *td = data;
-	(td->x)[1] = ((float) td->i) / testing_samples;
-	(td->v)[1] = 0.0;
-	(td->i)++;
-	if (td->i == testing_samples) {
-		return 1;
+void register_action(char *action, line_list *head) {
+	ail *new;
+	if (actions == NULL) { //first action
+		new = actions = malloc(sizeof(ail));
+	} else { //otherwise append
+		new = actions;
+		while (new->next != NULL) {
+			new = new->next;
+		}
+		new->next = malloc(sizeof(ail));
+		new = new->next;
+	}
+	new->ll = head;
+	new->action = action;
+	new->next = NULL;
+}
+
+void free_ail(ail *a) {
+	llfree(a->ll);
+	free(a->action);
+	free(a);
+}
+
+//Test Action (move) is living here temporarily before I split it out into a loading module.
+#include "vectors.h"
+
+typedef struct move_data {
+	vector x, loc;
+} move_data;
+
+unsigned short do_action(void *data) {
+	move_data *md = (move_data*) data;
+	Vadd(md->x, md->x, md->loc);
+	return 1;
+}
+
+void action_free_data(void *data) {
+	move_data *md = (move_data*) data;
+	free(md->loc);
+	free(md);
+}
+
+short setup_action(line_list *ll, temp_point *tree) {
+	unsigned int i = 0;
+	vector pos;
+	move_data *md;
+	char *w = get_word(ll->str, &i);
+	tree = find_pt(tree, w);
+	//test if the point exists
+	free(w);
+	pos = read_vector(ll->str, &i);
+	//test if vector exists
+	md = malloc(sizeof(move_data));
+	md->x = tree->fast->x;
+	md->loc = pos;
+	//give data and functions to handler
+	add_action(ACT_END, &do_action, (void*) md, &action_free_data);
+	return 0; //do some error conditions
+}
+
+//End of Test Action
+
+short init_actions(temp_point *tree) {
+	ail *next;
+	while (actions != NULL) {
+		//load action module
+		//setup action
+		setup_action(actions->ll, tree); //handle error conditions
+		next = actions->next;
+		free_ail(actions);
+		actions = next;
 	}
 	return 0;
-}
-
-void setup_test(temp_point *tree){
-	test_data *td = malloc(sizeof(test_data));
-	tree = find_pt(tree, "badboy");
-	td->v = tree->fast->v;
-	td->x = tree->fast->x;
-	td->i = 0;
-	add_action(&test_action, (void*) td, &free);
 }

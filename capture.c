@@ -23,7 +23,7 @@ static cdil *devices = NULL;
 static unsigned short no_devices = 0;
 static capture_device **capdevs = NULL;
 
-unsigned short register_capture(char *device, jack_ringbuffer_t *ringbuf, line_list *head) {
+void register_capture(char *device, jack_ringbuffer_t *ringbuf, line_list *head) {
 	cdil *new;
 	if (devices == NULL) {
 		new = devices = malloc(sizeof(cdil));
@@ -40,7 +40,7 @@ unsigned short register_capture(char *device, jack_ringbuffer_t *ringbuf, line_l
 	new->device = device;
 	new->ringbuf = ringbuf;
 	new->next = NULL;
-	return no_devices++;
+	no_devices++;
 }
 
 void get_output(void) {
@@ -87,4 +87,13 @@ short init_capture(temp_point *tree) {
 		devices = nxtdev;
 	}
 	return 0;
+}
+
+void free_capture(void) {
+	unsigned short device_no;
+	for (device_no=0; device_no<no_devices; device_no++) {
+		(capdevs[device_no]->free_data)((void*) capdevs[device_no]->data);
+		free(capdevs[device_no]);
+	}
+	free(capdevs);
 }

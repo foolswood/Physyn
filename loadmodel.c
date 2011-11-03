@@ -7,6 +7,7 @@
 #include "loadconf.h"
 #include "capture.h"
 #include "out_channels.h"
+#include "actions.h"
 
 void get_dimensions(line_list **hd) { //improve error messages
 	unsigned int i;
@@ -118,6 +119,12 @@ unsigned int pts_sp(line_list *head, temp_point **tree, temp_spring **sp) { //re
 					device_parameters = NULL;
 					extract_curly_braces(&head, &device_parameters, &i);
 					register_capture(str, create_output(str2), device_parameters);
+					break;
+				case 'a': //actions
+					str = get_word(head->str, &i); //the action to perform
+					device_parameters = NULL;
+					extract_curly_braces(&head, &device_parameters, &i);
+					register_action(str, device_parameters);
 			}
 		}
 		head = head->next;
@@ -136,6 +143,11 @@ model fileload(char *path) {
 	no_springs = listlen(springs);
 	if (no_springs && no_nodes) {
 		m = convert(tree, springs); //could make use of knowing springs and node numbers, since this works it out again
+	
+		// NASTY HACK FOR TESTING PURPOSES
+		init_actions(tree); //ERROR PROBLY HERE
+		// END OF VILE HACK
+		
 		init_capture(tree);
 		listmunch(springs);
 		treemunch(tree);

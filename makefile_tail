@@ -1,0 +1,9 @@
+capture/plugin_header.h capture/plugin_header.o : capture/plugin_header.c
+	cd capture; gcc -Wall -ggdb -c plugin_header.c; ../headergen.py plugin_header.c
+
+capture/point_velocity.so : capture/point_velocity.c capture/plugin_header.h parsingfuncs.h linelist.h tempmodel.h vectors.h
+	cd capture; gcc -Wall -c -fpic -ggdb point_velocity.c; gcc -shared -Wl,-soname,point_velocity.so -o point_velocity.so point_velocity.o
+
+clean :
+	rm *.o *.h physyn
+	cd capture; rm *.so *.o *.h

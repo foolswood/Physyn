@@ -1,10 +1,11 @@
-#include "ptrlist.h"
+#include "linelist.h"
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include "model.h"
 #include "tempmodel.h"
-#include "loadconf.h"
+#include "readfile.h"
+#include "parsingfuncs.h"
 #include "capture.h"
 #include "out_channels.h"
 #include "actions.h"
@@ -145,7 +146,7 @@ model fileload(char *path) {
 		m = convert(tree, springs); //could make use of knowing springs and node numbers, since this works it out again
 	
 		// NASTY HACK FOR TESTING PURPOSES
-		init_actions(tree); //ERROR PROBLY HERE
+		init_actions(tree);
 		// END OF VILE HACK
 		
 		init_capture(tree);

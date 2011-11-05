@@ -1,7 +1,5 @@
 #include "linelist.h"
 #include "charlist.h"
-#include <stdio.h>
-//#include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include "vectors.h"

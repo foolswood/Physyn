@@ -171,7 +171,7 @@ model convert(temp_point *tree, temp_spring *springlist) {
 		(sp[i]).b_no = springlist->connection_no_b;
 		(sp[i]).restlength = springlist->restlength;
 		(sp[i]).k = springlist->k;
-		//make the occasional use vector
+		//make the occasional use vector !!!!! THIS IS DAFT AND WAS DONE FOR THREADING REASONS, BETTER TO HAVE A PER THREAD TEMP VECTOR !!!!!!!!!!
 		(sp[i]).v = Vmk();
 		//advance through the list
 		springlist = springlist->next;

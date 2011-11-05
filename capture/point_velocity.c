@@ -1,6 +1,6 @@
 // A simple inverse square mic
-#include "../loadconf.h"
-#include "../ptrlist.h"
+#include "../parsingfuncs.h"
+#include "../linelist.h"
 #include "../tempmodel.h"
 #include "../vectors.h"
 #include "plugin_header.h"

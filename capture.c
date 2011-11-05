@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <jack/ringbuffer.h>
 #include "tempmodel.h"
-#include "ptrlist.h"
+#include "linelist.h"
 #include "capture/plugin_header.h"
 
 /*

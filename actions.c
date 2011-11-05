@@ -1,7 +1,7 @@
 #include "action_queue.h"
-#include "ptrlist.h"
+#include "linelist.h"
 #include "tempmodel.h"
-#include "loadconf.h"
+#include "parsingfuncs.h"
 
 typedef struct ail {
 	line_list *ll;

@@ -7,7 +7,6 @@
 #include "readfile.h"
 #include "parsingfuncs.h"
 #include "capture.h"
-#include "out_channels.h"
 #include "actions.h"
 
 void get_dimensions(line_list **hd) { //improve error messages
@@ -119,7 +118,7 @@ unsigned int pts_sp(line_list *head, temp_point **tree, temp_spring **sp) { //re
 					str2 = get_word(head->str, &i); //output port name
 					device_parameters = NULL;
 					extract_curly_braces(&head, &device_parameters, &i);
-					register_capture(str, create_output(str2), device_parameters);
+					register_capture(str, str2, device_parameters);
 					break;
 				case 'a': //actions
 					str = get_word(head->str, &i); //the action to perform

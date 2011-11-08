@@ -1,9 +1,10 @@
 #include "loadmodel.h"
-#include "out_channels.h"
+#include "jack_interface.h"
 #include "springs.h"
 #include "points.h"
 #include "capture.h"
 #include "action_queue.h"
+#include <stdio.h>
 
 short rtloop(model m) {
 	static int i;
@@ -22,9 +23,10 @@ int main(void) {
 	model m;
 	unsigned int rate;
 	int i;
-	rate = out_init();
+	rate = jack_init();
 	m = fileload("trial.pts");
-	if (rate == 0) {
+	if ( rate == 0 ) {
+		printf("Exiting: Could Not Create Jack Client\n");
 		return 1;
 	}
 	rtloop(m);

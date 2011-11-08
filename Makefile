@@ -1,6 +1,6 @@
 all : physyn plugins
 
-physyn : physyn.c capture.o loadmodel.o model.o out_channels.o physyn.o points.o linelist.o charlist.o springs.o tempmodel.o vectors.o action_queue.o
+physyn : physyn.c capture.o loadmodel.o model.o jack_interface.o physyn.o points.o linelist.o charlist.o springs.o tempmodel.o vectors.o action_queue.o
 	gcc -Wall -ggdb -rdynamic -lm -ldl `pkg-config --cflags --libs jack` -o physyn *.o
 
 plugins : capture/point_velocity.so
@@ -13,7 +13,7 @@ actions.o actions.h : actions.c action_queue.h linelist.h tempmodel.h parsingfun
 	./headergen.py actions.c
 	gcc -Wall -ggdb -c actions.c
 
-capture.o capture.h : capture.c tempmodel.h linelist.h capture/plugin_header.h 
+capture.o capture.h : capture.c tempmodel.h linelist.h jack_interface.h capture/plugin_header.h 
 	./headergen.py capture.c
 	gcc -Wall -ggdb -c capture.c
 
@@ -21,21 +21,29 @@ charlist.o charlist.h : charlist.c
 	./headergen.py charlist.c
 	gcc -Wall -ggdb -c charlist.c
 
+jack_interface.o jack_interface.h : jack_interface.c 
+	./headergen.py jack_interface.c
+	gcc -Wall -ggdb -c jack_interface.c
+
 linelist.o linelist.h : linelist.c charlist.h 
 	./headergen.py linelist.c
 	gcc -Wall -ggdb -c linelist.c
 
-loadmodel.o loadmodel.h : loadmodel.c linelist.h model.h tempmodel.h readfile.h parsingfuncs.h capture.h out_channels.h actions.h 
+loadmodel.o loadmodel.h : loadmodel.c linelist.h model.h tempmodel.h readfile.h parsingfuncs.h capture.h actions.h 
 	./headergen.py loadmodel.c
 	gcc -Wall -ggdb -c loadmodel.c
+
+midi_eventgen.o midi_eventgen.h : midi_eventgen.c 
+	./headergen.py midi_eventgen.c
+	gcc -Wall -ggdb -c midi_eventgen.c
+
+midi_input.o midi_input.h : midi_input.c 
+	./headergen.py midi_input.c
+	gcc -Wall -ggdb -c midi_input.c
 
 model.o model.h : model.c points.h springs.h 
 	./headergen.py model.c
 	gcc -Wall -ggdb -c model.c
-
-out_channels.o out_channels.h : out_channels.c 
-	./headergen.py out_channels.c
-	gcc -Wall -ggdb -c out_channels.c
 
 parsingfuncs.o parsingfuncs.h : parsingfuncs.c linelist.h charlist.h vectors.h 
 	./headergen.py parsingfuncs.c

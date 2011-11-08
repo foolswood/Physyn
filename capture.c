@@ -5,6 +5,7 @@
 #include <jack/ringbuffer.h>
 #include "tempmodel.h"
 #include "linelist.h"
+#include "jack_interface.h"
 #include "capture/plugin_header.h"
 
 /*
@@ -14,8 +15,8 @@
 
 typedef struct cdil {
 	line_list *ll;
-	char * device;
-	jack_ringbuffer_t *ringbuf;
+	char *device;
+	char *portname;
 	struct cdil *next;
 } cdil; //capture device initialization list
 
@@ -23,7 +24,7 @@ static cdil *devices = NULL;
 static unsigned short no_devices = 0;
 static capture_device **capdevs = NULL;
 
-void register_capture(char *device, jack_ringbuffer_t *ringbuf, line_list *head) {
+void register_capture(char *device, char *portname, line_list *head) {
 	cdil *new;
 	if (devices == NULL) {
 		new = devices = malloc(sizeof(cdil));
@@ -38,7 +39,7 @@ void register_capture(char *device, jack_ringbuffer_t *ringbuf, line_list *head)
 	}
 	new->ll = head;
 	new->device = device;
-	new->ringbuf = ringbuf;
+	new->portname = portname;
 	new->next = NULL;
 	no_devices++;
 }
@@ -60,6 +61,7 @@ short init_capture(temp_point *tree) {
 	char *str;
 	void *libhandle;
 	cdil *nxtdev;
+	jack_ringbuffer_t *ringbuf;
 	void *(*fptr)(line_list*, temp_point*);
 	capdevs = calloc(no_devices, sizeof(capture_device*));
 	for (i=0; i<no_devices; i++) {
@@ -78,10 +80,13 @@ short init_capture(temp_point *tree) {
 		//call the device's init function
 		fptr = dlsym(libhandle, "init");
 		capdevs[i] = (*fptr)(devices->ll, tree);
-		capdevs[i]->ringbuf = devices->ringbuf;
+		//create the ringbuffer
+		ringbuf = create_audioport(devices->portname, AUDIOPORT_OUTPUT);
+		capdevs[i]->ringbuf = ringbuf;
 		//free memory for the initializer and move on to the next one
 		llfree(devices->ll);
 		free(devices->device);
+		free(devices->portname);
 		nxtdev = devices->next;
 		free(devices);
 		devices = nxtdev;

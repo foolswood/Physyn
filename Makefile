@@ -1,7 +1,7 @@
 all : physyn plugins
 
 physyn : physyn.c capture.o loadmodel.o model.o jack_interface.o physyn.o points.o linelist.o charlist.o springs.o tempmodel.o vectors.o action_queue.o
-	gcc -Wall -ggdb -rdynamic -lm -ldl `pkg-config --cflags --libs jack` -o physyn *.o
+	gcc -Wall -ggdb -rdynamic -lm -ldl `pkg-config --cflags --libs jack` -o physyn *.o actions/move.o
 
 plugins : capture/point_velocity.so
 

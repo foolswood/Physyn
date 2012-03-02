@@ -1,3 +1,4 @@
+#include <dlfcn.h>
 #include "action_queue.h"
 #include "linelist.h"
 #include "tempmodel.h"
@@ -34,51 +35,27 @@ void free_ail(ail *a) {
 	free(a);
 }
 
-//Test Action (move) is living here temporarily before I split it out into a loading module.
-#include "vectors.h"
-
-typedef struct move_data {
-	vector x, loc;
-} move_data;
-
-unsigned short do_action(void *data) {
-	move_data *md = (move_data*) data;
-	Vadd(md->x, md->x, md->loc);
-	return 1;
-}
-
-void action_free_data(void *data) {
-	move_data *md = (move_data*) data;
-	free(md->loc);
-	free(md);
-}
-
-short setup_action(line_list *ll, temp_point *tree) {
-	unsigned int i = 0;
-	vector pos;
-	move_data *md;
-	char *w = get_word(ll->str, &i);
-	tree = find_pt(tree, w);
-	//test if the point exists
-	free(w);
-	pos = read_vector(ll->str, &i);
-	//test if vector exists
-	md = malloc(sizeof(move_data));
-	md->x = tree->fast->x;
-	md->loc = pos;
-	//give data and functions to handler
-	add_action(ACT_END, &do_action, (void*) md, &action_free_data);
-	return 0; //do some error conditions
-}
-
-//End of Test Action
-
 short init_actions(temp_point *tree) {
 	ail *next;
+	char *str;
+	void *libhandle;
+	void *(*fptr)(line_list*, temp_point*);
 	while (actions != NULL) {
-		//load action module
-		//setup action
-		setup_action(actions->ll, tree); //handle error conditions
+		//action module file path
+		str = calloc(strlen(actions->action)+11, sizeof(char));
+		strcpy(str, "actions/");
+		strcat(str, actions->action);
+		strcat(str, ".so");
+		//load module
+		libhandle = dlopen(str, RTLD_NOW);
+		free(str);
+		if (!libhandle) {
+			printf("error in dlopen(%s)\n%s\n", str, dlerror());
+			return 1;
+		}
+		//call action setup
+		fptr = dlsym(libhandle, "setup_action"); //should probably be called init or something less wierd
+		fptr(actions->ll, tree); //handle error conditions
 		next = actions->next;
 		free_ail(actions);
 		actions = next;

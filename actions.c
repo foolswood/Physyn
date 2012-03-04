@@ -48,11 +48,12 @@ short init_actions(temp_point *tree) {
 		strcat(str, ".so");
 		//load module
 		libhandle = dlopen(str, RTLD_NOW);
-		free(str);
 		if (!libhandle) {
 			printf("error in dlopen(%s)\n%s\n", str, dlerror());
+			free(str);
 			return 1;
 		}
+		free(str);
 		//call action setup
 		fptr = dlsym(libhandle, "setup_action"); //should probably be called init or something less wierd
 		fptr(actions->ll, tree); //handle error conditions

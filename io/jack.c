@@ -40,7 +40,7 @@ short push_audio(const float const *sample, const unsigned short out_id) {
 	if (output_buffers == NULL)
 		return 1;
 	while (jack_ringbuffer_write_space(output_buffers[out_id]) < sizeof(float))
-		usleep(100); //Do something cleverer (signals or locks something)
+		usleep(10); //Do something cleverer (signals or locks something)
 	jack_ringbuffer_write(output_buffers[out_id], sc, sizeof(float));
 	return 0;
 }
@@ -54,6 +54,7 @@ short push_audio(const float const *sample, const unsigned short out_id) {
 static int set_buffersize(jack_nframes_t nframes, void *voidptr) {
 	//Creates ringbuffers of the appropriate length (currently clears them)
 	unsigned short n;
+	float zf = 0.0;
 	if (output_buffers == NULL)
 		output_buffers = calloc(n_outputs, sizeof(jack_ringbuffer_t*));
 	else {
@@ -63,8 +64,10 @@ static int set_buffersize(jack_nframes_t nframes, void *voidptr) {
 	for (n = 0; n < n_outputs; n++) {
 		output_buffers[n] = jack_ringbuffer_create(nframes*sizeof(float));
 		jack_ringbuffer_mlock(output_buffers[n]);
+		//initially fill with zeros
+		while (jack_ringbuffer_write_space(output_buffers[n]) != 0)
+			jack_ringbuffer_write(output_buffers[n], (char*) &zf, sizeof(float));
 	}
-	//initially fill with zeros?
 	return 0;
 }
 
@@ -72,9 +75,9 @@ static int process(jack_nframes_t nframes, void *voidptr) {
 	static unsigned short n;
 	//Jack Process Callback
 	for (n = 0; n < n_outputs; n++) {
-		if (jack_ringbuffer_read_space(output_buffers[n]) < nframes)
+		if (jack_ringbuffer_read_space(output_buffers[n]) < nframes*sizeof(float))
 			return 1;
-		jack_ringbuffer_read(output_buffers[n], jack_port_get_buffer(output_ports[n], nframes), nframes);
+		jack_ringbuffer_read(output_buffers[n], jack_port_get_buffer(output_ports[n], nframes*sizeof(float)), nframes*sizeof(float));
 	}
 	return 0;
 }

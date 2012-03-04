@@ -70,6 +70,7 @@ short init_capture(temp_point *tree) {
 	push_audio = io_func("push_audio");
 	capdevs = calloc(no_devices, sizeof(capture_device*));
 	for (i=0; i<no_devices; i++) {
+		capdevs[i] = malloc(sizeof(capture_device));
 		//create the path string for the capture device file
 		str = calloc(strlen(devices->device)+11, sizeof(char));
 		strcpy(str, "capture/");
@@ -77,13 +78,15 @@ short init_capture(temp_point *tree) {
 		strcat(str, ".so");
 		//load the capture device
 		libhandle = dlopen(str, RTLD_NOW); //might be memory inefficient, but guarantees that no loading can be required during rt operation
-		free(str);
 		if (!libhandle) {
 			printf("error in dlopen(%s)\n%s\n", str, dlerror());
+			free(str);
 			return 1;
 		}
+		free(str);
 		//call the device's init function
 		fptr = dlsym(libhandle, "init");
+		capdevs[i]->data = NULL;
 		capdevs[i]->data = (*fptr)(devices->ll, tree);
 		//get other functions
 		capdevs[i]->get_output = dlsym(libhandle, "get_out");

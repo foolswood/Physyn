@@ -23,7 +23,7 @@ unsigned int load_io(const char const *name) {
 	free(str);
 	//call io setup
 	fptr = dlsym(libhandle, "init");
-	return fptr(name);
+	return fptr("physyn");
 }
 
 //this doesn't add much

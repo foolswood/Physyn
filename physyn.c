@@ -1,14 +1,16 @@
 #include "loadmodel.h"
-#include "jack_interface.h"
+#include "IO.h"
 #include "springs.h"
 #include "points.h"
 #include "capture.h"
 #include "action_queue.h"
 #include <stdio.h>
 
+//move load file functions to here
+
 short rtloop(model m) {
 	static int i;
-	for (i=0; i<1024; i++) {
+	for (i=0; i<10000000; i++) {
 		do_actions(ACT_START);
 		apply_springs(m.s);
 		do_actions(ACT_MIDDLE);
@@ -22,18 +24,22 @@ short rtloop(model m) {
 int main(void) {
 	model m;
 	unsigned int rate;
-	int i;
-	rate = jack_init();
-	m = fileload("trial.pts");
+	void (*io_go)(void);
+	//parse arguments
+	//load IO
+	rate = load_io("jack"); //eventually cater for more
 	if ( rate == 0 ) {
-		printf("Exiting: Could Not Create Jack Client\n");
+		printf("Exiting: Could Not Setup IO\n");
 		return 1;
 	}
+	//load file
+	m = fileload("trial.pts");
+	//prepare to simulate
+	io_go = io_func("go");
+	(*io_go)();
+	//simulate
 	rtloop(m);
-	jack_go();
-	for (i=0; i<1024; i++) {
-		rtloop(m);
-	}
+	//free everything
 	free_capture();
 	return 0;
 }

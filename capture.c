@@ -6,12 +6,18 @@
 #include "tempmodel.h"
 #include "linelist.h"
 #include "jack_interface.h"
-#include "capture/plugin_header.h"
 
 /*
  * Provides dynamic loading of capture plugins.
  * Capture plugins are for things like mics and pickups.
  */
+
+typedef struct capture_device {
+	float (*get_output) (void*);
+	unsigned short out_id;
+	void *data;
+	void (*free_data) (void*);
+} capture_device;
 
 typedef struct cdil {
 	line_list *ll;
@@ -44,15 +50,14 @@ void register_capture(char *device, char *portname, line_list *head) {
 	no_devices++;
 }
 
+short (*push_audio)(float*, const unsigned short);
+
 void get_output(void) {
 	unsigned short device_no;
 	float output;
 	for (device_no=0; device_no<no_devices; device_no++) { //this loop is a prime candidate for parallelization
 		output = (capdevs[device_no]->get_output)((void*) capdevs[device_no]->data);
-		while (jack_ringbuffer_write_space(capdevs[device_no]->ringbuf) < sizeof(float)) {
-			usleep(200);
-		}
-		jack_ringbuffer_write(capdevs[device_no]->ringbuf, (char*) &output, sizeof(float));
+		(*push_audio)(capdevs[device_no]->out_id, &output); //do something on failure
 	}
 }
 
@@ -61,8 +66,9 @@ short init_capture(temp_point *tree) {
 	char *str;
 	void *libhandle;
 	cdil *nxtdev;
-	jack_ringbuffer_t *ringbuf;
 	void *(*fptr)(line_list*, temp_point*);
+	unsigned short (*create_audio_out)(char*) = io_func("create_audio_out");
+	push_audio = io_func("push_audio");
 	capdevs = calloc(no_devices, sizeof(capture_device*));
 	for (i=0; i<no_devices; i++) {
 		//create the path string for the capture device file
@@ -79,10 +85,12 @@ short init_capture(temp_point *tree) {
 		}
 		//call the device's init function
 		fptr = dlsym(libhandle, "init");
-		capdevs[i] = (*fptr)(devices->ll, tree);
-		//create the ringbuffer
-		ringbuf = create_audioport(devices->portname, AUDIOPORT_OUTPUT);
-		capdevs[i]->ringbuf = ringbuf;
+		capdevs[i]->data = (*fptr)(devices->ll, tree);
+		//get other functions
+		capdevs[i]->get_output = dlsym(libhandle, "get_out");
+		capdevs[i]->free_data = dlsym(libhandle, "free_data");
+		//create audio output
+		capdevs[i]->out_id = (*create_audio_out)(devices->portname);
 		//free memory for the initializer and move on to the next one
 		llfree(devices->ll);
 		free(devices->device);

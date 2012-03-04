@@ -34,9 +34,12 @@ unsigned short create_audio_out(const char const *output_name) {
 
 short push_audio(const float const *sample, const unsigned short out_id) {
 	const char *sc = (const char *) sample;
+	if (output_buffers == NULL)
+		return 1;
 	while (jack_ringbuffer_write_space(output_buffers[out_id]) < sizeof(float))
 		usleep(100); //Do something cleverer (signals or locks something)
 	jack_ringbuffer_write(output_buffers[out_id], sc, sizeof(float));
+	return 0;
 }
 
 //short pull_midi(void *voidptr) {
@@ -57,6 +60,7 @@ static int set_buffersize(jack_nframes_t nframes, void *voidptr) {
 		output_ports[n] = jack_ringbuffer_create(nframes*sizeof(float));
 		jack_ringbuffer_mlock(output_ports[n]);
 	}
+	//initially fill with zeros?
 }
 
 static int process(jack_nframes_t nframes, void *voidptr) {

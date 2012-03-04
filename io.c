@@ -2,7 +2,7 @@
 
 static void *libhandle = NULL;
 
-unsigned int load_output(const char const *name, temp_point *tree) {
+unsigned int load_io(const char const *name, temp_point *tree) {
 	char *str;
 	unsigned int (*fptr)(temp_point*);
 	//IO module file path
@@ -23,6 +23,6 @@ unsigned int load_output(const char const *name, temp_point *tree) {
 }
 
 //this doesn't add much
-void *output_func(const char const *str) {
+void *io_func(const char const *str) {
 	return dlsym(libhandle, str);
 }

@@ -26,7 +26,7 @@ unsigned short create_audio_out(const char const *output_name) {
 	ports[n] = port; //might be n+1
 	free(output_ports);
 	output_ports = ports;
-	return ++n_outputs;
+	return n_outputs++;
 }
 
 //void *create_midi_in(char *name) {
@@ -83,6 +83,7 @@ static int process(jack_nframes_t nframes, void *voidptr) {
 }
 
 void go(void) {
+	set_buffersize(jack_get_buffer_size(client), NULL);
 	//do a jack_latency callback
 	jack_set_buffer_size_callback(client, set_buffersize, NULL);
 	jack_set_process_callback(client, process, NULL);

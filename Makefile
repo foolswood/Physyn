@@ -3,7 +3,7 @@ all : physyn plugins
 physyn : physyn.c action_queue.o actions.o capture.o charlist.o io.o linelist.o loadmodel.o model.o parsingfuncs.o points.o readfile.o springs.o tempmodel.o vectors.o loadmodel.h io.h springs.h points.h capture.h action_queue.h 
 	gcc -Wall -ggdb -rdynamic -lm -ldl  -ljack -lpthread -lrt   physyn.c -o physyn *.o
 
-plugins : actions/move.so capture/point_velocity.so io/jack.so testcrap/midi_eventgen.so testcrap/midi_input.so 
+plugins : actions/move.so capture/point_velocity.so io/jack.so 
 
 action_queue.h : action_queue.c 
 	./headergen.py action_queue.c
@@ -100,14 +100,6 @@ capture/point_velocity.so : capture/point_velocity.c parsingfuncs.h linelist.h t
 io/jack.so : io/jack.c 
 	gcc -Wall -ggdb -fpic -c io/jack.c -o io/jack.o
 	gcc -shared -Wl,-soname,io/jack.so -o io/jack.so io/jack.o
-
-testcrap/midi_eventgen.so : testcrap/midi_eventgen.c 
-	gcc -Wall -ggdb -fpic -c testcrap/midi_eventgen.c -o testcrap/midi_eventgen.o
-	gcc -shared -Wl,-soname,testcrap/midi_eventgen.so -o testcrap/midi_eventgen.so testcrap/midi_eventgen.o
-
-testcrap/midi_input.so : testcrap/midi_input.c 
-	gcc -Wall -ggdb -fpic -c testcrap/midi_input.c -o testcrap/midi_input.o
-	gcc -shared -Wl,-soname,testcrap/midi_input.so -o testcrap/midi_input.so testcrap/midi_input.o
 
 clean :
 	rm *.o *.h physyn

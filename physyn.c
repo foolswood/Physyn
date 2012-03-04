@@ -1,5 +1,5 @@
 #include "loadmodel.h"
-#include "IO.h"
+#include "io.h"
 #include "springs.h"
 #include "points.h"
 #include "capture.h"

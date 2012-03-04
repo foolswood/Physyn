@@ -2,10 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <jack/ringbuffer.h>
 #include "tempmodel.h"
 #include "linelist.h"
-#include "jack_interface.h"
+#include "io.h"
 
 /*
  * Provides dynamic loading of capture plugins.
@@ -57,7 +56,7 @@ void get_output(void) {
 	float output;
 	for (device_no=0; device_no<no_devices; device_no++) { //this loop is a prime candidate for parallelization
 		output = (capdevs[device_no]->get_output)((void*) capdevs[device_no]->data);
-		(*push_audio)(capdevs[device_no]->out_id, &output); //do something on failure
+		(*push_audio)(&output, capdevs[device_no]->out_id); //do something on failure
 	}
 }
 

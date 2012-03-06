@@ -62,10 +62,10 @@ static int set_buffersize(jack_nframes_t nframes, void *voidptr) {
 			jack_ringbuffer_free(output_buffers[n]);
 	}
 	for (n = 0; n < n_outputs; n++) {
-		output_buffers[n] = jack_ringbuffer_create(nframes*sizeof(float));
+		output_buffers[n] = jack_ringbuffer_create(nframes*sizeof(float)*2);
 		jack_ringbuffer_mlock(output_buffers[n]);
 		//initially fill with zeros
-		while (jack_ringbuffer_write_space(output_buffers[n]) != 0)
+		while (jack_ringbuffer_write_space(output_buffers[n]) >= sizeof(float))
 			jack_ringbuffer_write(output_buffers[n], (char*) &zf, sizeof(float));
 	}
 	return 0;
@@ -77,7 +77,7 @@ static int process(jack_nframes_t nframes, void *voidptr) {
 	for (n = 0; n < n_outputs; n++) {
 		if (jack_ringbuffer_read_space(output_buffers[n]) < nframes*sizeof(float))
 			return 1;
-		jack_ringbuffer_read(output_buffers[n], jack_port_get_buffer(output_ports[n], nframes*sizeof(float)), nframes*sizeof(float));
+		jack_ringbuffer_read(output_buffers[n], jack_port_get_buffer(output_ports[n], nframes), nframes*sizeof(float));
 	}
 	return 0;
 }

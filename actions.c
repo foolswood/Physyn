@@ -42,7 +42,7 @@ short init_actions(temp_point *tree) {
 	void *(*fptr)(line_list*, temp_point*);
 	while (actions != NULL) {
 		//action module file path
-		str = calloc(strlen(actions->action)+11, sizeof(char));
+		str = calloc(strlen(actions->action)+12, sizeof(char));
 		strcpy(str, "actions/");
 		strcat(str, actions->action);
 		strcat(str, ".so");

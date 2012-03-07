@@ -9,7 +9,7 @@ unsigned int load_io(const char const *name) {
 	char *str;
 	unsigned int (*fptr)(const char const*);
 	//IO module file path
-	str = calloc(strlen(name)+6, sizeof(char));
+	str = calloc(strlen(name)+7, sizeof(char));
 	strcpy(str, "io/");
 	strcat(str, name);
 	strcat(str, ".so");

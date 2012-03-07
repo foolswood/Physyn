@@ -10,7 +10,7 @@
 
 short rtloop(model m) {
 	static int i;
-	for (i=0; i<10000000; i++) {
+	for (i=0; i<100000; i++) {
 		do_actions(ACT_START);
 		apply_springs(m.s);
 		do_actions(ACT_MIDDLE);

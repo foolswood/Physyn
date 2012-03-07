@@ -62,21 +62,3 @@ void apply_forces(pointset a) {
 		apply_force((a.pts)+p);
 	}
 }
-
-/*
-int runtest(void) {
-	point a;
-	float n[] = {0.0, 0.0};
-	a.x = n;
-	float m[] = {0.0, 0.0};
-	a.v = m;
-	float l[] = {1.0, 0.0};
-	a.F = l;
-	a.b = 1.0;
-	a.mass = 1.0;
-	pointset b = {1, &a};
-	apply_forces(&b);
-	Vprint(a.x);
-	return 0;
-}
-*/

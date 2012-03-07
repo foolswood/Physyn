@@ -1,29 +1,29 @@
 #this is a comment
 dimensions 2
 
-p dang (-0.5, 0.0) inf 1.0
-p anvil (0.0, 0.0) 0.001 1.0001
-s dang anvil 0.3 2000.0
+p dang (0.0, 0.0) inf 1.0
+p anvil (0.5, 0.0) 0.001 1.0001
+s dang anvil 0.25 2000.0
 
-p candle (0.5, 0.0) 0.001 0.9999
-s anvil candle 0.3 2000.0
+p candle (1.0, 0.0) 0.001 0.9999
+s anvil candle 0.25 2000.0
 
-p badboy (1.0, 0.0) 0.001 0.9999
-s badboy candle 0.3 2000.0
+p badboy (1.5, 0.0) 0.001 0.9999
+s badboy candle 0.25 2000.0
 
-p arc (1.5, 0.0) 0.001 0.9999
-s arc badboy 0.3 2000.0
+p arc (2.0, 0.0) 0.001 0.9999
+s arc badboy 0.25 2000.0
 
-p car (2.0, 0.0) 0.001 0.9999
-s arc car 0.3 2000.0
+p car (2.5, 0.0) 0.001 0.9999
+s arc car 0.25 2000.0
 
-p biddy (2.5, 0.0) inf 0.9999
-s car biddy 0.3 2000.0
+p biddy (3.0, 0.0) inf 0.9999
+s car biddy 0.25 2000.0
 
 c point_velocity out_1 {
-	arc (0.0, 1.0) 0.0008
+	arc (0.0, 1.0) 0.3
 }
 
 a move {
-	candle (0.5, 0.001)
+	candle (0.0, 0.001)
 }

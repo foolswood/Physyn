@@ -21,7 +21,7 @@ gen_entry() {
 	echo -n "$basename".o ": $1 "
 	do_includes $1
 	echo
-	echo "	gcc -Wall -ggdb -c $1"
+	echo "	\$(CC) \$(CFLAGS) -c $1"
 	echo
 }
 
@@ -48,7 +48,7 @@ gen_plugin() {
 	echo -n "$basename".so ": $1 "
 	do_plugin_includes $1
 	echo
-	echo "	gcc -Wall -ggdb -fpic -c $1 -o "$basename".o"
+	echo "	\$(CC) \$(CFLAGS) -fpic -c $1 -o "$basename".o"
 	echo "	gcc -shared -Wl,-soname,"$basename".so -o "$basename".so "$basename".o"
 	echo
 }
@@ -71,7 +71,7 @@ gen_main() {
 	done
 	do_includes "physyn.c"
 	echo
-	echo "	gcc -Wall -ggdb -rdynamic -lm -ldl `pkg-config --cflags --libs jack` physyn.c -o physyn *.o"
+	echo "	\$(CC) \$(CFLAGS) -rdynamic -lm -ldl `pkg-config --cflags --libs jack` physyn.c -o physyn *.o"
 	echo
 }
 
@@ -85,6 +85,9 @@ gen_plugin_entry() {
 	echo
 	echo
 }
+
+echo 'CC=gcc'
+echo 'CFLAGS=-Wall -ggdb'
 
 echo "all : physyn plugins"
 echo

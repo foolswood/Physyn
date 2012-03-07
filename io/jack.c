@@ -40,7 +40,7 @@ short push_audio(const float const *sample, const unsigned short out_id) {
 	if (output_buffers == NULL)
 		return 1;
 	while (jack_ringbuffer_write_space(output_buffers[out_id]) < sizeof(float))
-		usleep(10); //Do something cleverer (signals or locks something)
+		usleep(500); //Do something cleverer (signals or locks something)
 	jack_ringbuffer_write(output_buffers[out_id], sc, sizeof(float));
 	return 0;
 }

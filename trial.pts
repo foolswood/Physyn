@@ -47,5 +47,5 @@ c point_velocity out_1 {
 }
 
 a move {
-	c (2, 2, 0.5)
+	c (0, 0, 0.5)
 }

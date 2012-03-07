@@ -19,5 +19,5 @@ c point_velocity out_1 {
 
 #action of type move
 a move {
-	bee (0.0, 1.0) #move point bee to location (0,1)
+	bee (0.0, 1.0) #move point bee to (0,1) from where it is
 }

@@ -72,7 +72,7 @@ short init_capture(temp_point *tree) {
 	for (i=0; i<no_devices; i++) {
 		capdevs[i] = malloc(sizeof(capture_device));
 		//create the path string for the capture device file
-		str = calloc(strlen(devices->device)+11, sizeof(char));
+		str = calloc(strlen(devices->device)+12, sizeof(char));
 		strcpy(str, "capture/");
 		strcat(str, devices->device);
 		strcat(str, ".so");

@@ -33,13 +33,15 @@ void do_actions(int when) {
 		rval = (active->act)((void*) active->data);
 		if (rval) { //destroy the acting action
 			if (prev == NULL) { //first in list :. free memory and move the start of the list on
-				(active->free_data)((void*) active->data);
+				if (active->free_data != NULL)
+					(active->free_data)((void*) active->data);
 				active = (acting[when])->next;
 				free(acting[when]);
 				acting[when] = active;
 			} else { //in middle of list
 				prev->next = active->next;
-				(active->free_data)((void*) active->data);
+				if (active->free_data != NULL)
+					(active->free_data)((void*) active->data);
 				free(active);
 				active = prev->next;
 			}

@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <jack/jack.h>
 #include <jack/ringbuffer.h>
+#include <jack/midiport.h>
 
 static jack_client_t *client;
 
@@ -12,6 +13,7 @@ unsigned int init(const char const *name) {
 		return 0;
 	return (unsigned int) jack_get_sample_rate(client);
 }
+
 
 static jack_port_t **output_ports = NULL;
 static jack_ringbuffer_t **output_buffers = NULL;
@@ -29,8 +31,18 @@ unsigned short create_audio_out(const char const *output_name) {
 	return n_outputs++;
 }
 
-//void *create_midi_in(char *name) {
-//}
+
+static jack_port_t *midi_port = NULL;
+static jack_midi_event_t *midi_buffer = NULL;
+static short do_mevent = 0;
+static short (*midi_handler)(unsigned char*, size_t, void*) = NULL;
+static void *handler_data = NULL;
+
+void create_midi_in(const char const *input_name, short (*mh)(unsigned char*, size_t, void*), void *hd) {
+	midi_port = jack_port_register(client, input_name, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
+	midi_handler = mh;
+	handler_data = hd;
+}
 
 //void *create_audio_in(char *name) {
 //}
@@ -45,8 +57,15 @@ short push_audio(const float const *sample, const unsigned short out_id) {
 	return 0;
 }
 
-//short pull_midi(void *voidptr) {
-//}
+short pull_midi(void) {
+	short rcode;
+	if (do_mevent == 1) {
+		do_mevent = 0;
+		rcode = midi_handler((unsigned char*) midi_buffer->buffer, midi_buffer->size, handler_data);
+		return rcode;
+	}
+	return 0;
+}
 
 //short pull_audio(void *voidptr) {
 //}
@@ -68,12 +87,19 @@ static int set_buffersize(jack_nframes_t nframes, void *voidptr) {
 		while (jack_ringbuffer_write_space(output_buffers[n]) >= sizeof(float))
 			jack_ringbuffer_write(output_buffers[n], (char*) &zf, sizeof(float));
 	}
+	//MIDI?
+	midi_buffer = malloc(sizeof(jack_midi_event_t));
 	return 0;
 }
 
 static int process(jack_nframes_t nframes, void *voidptr) {
 	static unsigned short n;
 	//Jack Process Callback
+	//Midi - Deal with multiple events/frame
+	if (jack_midi_event_get(midi_buffer, jack_port_get_buffer(midi_port, nframes), 0) == 0) {
+		do_mevent = 1;
+	}
+	//Audio
 	for (n = 0; n < n_outputs; n++) {
 		if (jack_ringbuffer_read_space(output_buffers[n]) < nframes*sizeof(float))
 			return 1;

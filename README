@@ -9,3 +9,6 @@ Just type make to build (for some reason -j n options make it not build, a bette
 This currently only operates on trial.pts, this will not remain the behaviour, it was for testing of a new feature.
 
 The makegen.sh script is for generating the Makefile, and is intended for use by developers, the one included should work if you just want to have a play.
+
+
+To use send it any midi event and it will make a noise (this will get fancier).

@@ -10,7 +10,9 @@
 
 short rtloop(model m) {
 	static int i;
-	for (i=0; i<100000; i++) {
+	short (*pm)(void) = io_func("pull_midi");
+	for (i=0; i<10000000; i++) {
+		(*pm)();
 		do_actions(ACT_START);
 		apply_springs(m.s);
 		do_actions(ACT_MIDDLE);

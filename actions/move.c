@@ -3,6 +3,7 @@
 #include "../tempmodel.h"
 #include "../parsingfuncs.h"
 #include "../vectors.h"
+#include "../io.h"
 
 //Test Action (move) - Should be a dynamic loaded module
 
@@ -22,11 +23,17 @@ void action_free_data(void *data) {
 	free(md);
 }
 
+short on_midi(unsigned char* buffer, size_t size, void *data) {
+	add_action(ACT_START, &do_action, data, NULL);
+	return 0;
+}
+
 short setup_action(line_list *ll, temp_point *tree) {
 	unsigned int i = 0;
 	vector pos;
 	move_data *md;
 	char *w = get_word(ll->str, &i);
+	void (*cmi)(char*, short (*mh)(unsigned char*, size_t, void*), void *hd) = io_func("create_midi_in");
 	tree = find_pt(tree, w);
 	//test if the point exists
 	free(w);
@@ -36,6 +43,6 @@ short setup_action(line_list *ll, temp_point *tree) {
 	md->x = tree->fast->x;
 	md->loc = pos;
 	//give data and functions to handler
-	add_action(ACT_END, &do_action, (void*) md, &action_free_data);
+	(*cmi)("move", &on_midi, (void*) md);
 	return 0; //do some error conditions
 }

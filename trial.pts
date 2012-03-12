@@ -1,51 +1,23 @@
-#this is a comment
-dimensions 3
+#specify the number of dimensions (this has to be before any points)
+dimensions 2
 
-#outer ring
-p ot (2, 0, 0) inf 1.0
-p otr (4, 1, 0) inf 1.0
-p obr (4, 3, 0) inf 1.0
-p ob (2, 4, 0) inf 1.0
-p obl (0, 3, 0) inf 1.0
-p otl (0, 1, 0) inf 1.0
+#create a point called anvil at location (0,0) fixed position (infinite mass), with no damping (damping of 0 totally damped (no movement) damping of 1 undamped).
+p anvil (0.0, 0.0) inf 1.0
 
-#middle ring
-p mtl (1.5, 1, 0) 0.01 0.999
-p mtr (2.5, 1, 0) 0.01 0.9991
-p mr (3, 2, 0) 0.01 0.999
-p mbl (1.5, 3, 0) 0.01 0.999
-p mbr (2.5, 3, 0) 0.01 0.999
-p ml (1, 2, 0.0) 0.01 0.999
+#create another 2 points
+p bee (1.0, 0.0) 0.005 0.9999
+p car (2.0, 0.0) inf 1.0
 
-#center point
-p c (2, 2, 0.0) 0.01 0.9992
+#create a spring between the points anvil and bee, restlength 0.5, stiffness 1000. Springs can be created as soon as the points they apply to have been defined.
+s anvil bee 0.5 1000.0
+s bee car 0.5 1000.0
 
-#outer springs
-s ot mtl 0.2 1000.0
-s ot mtr 0.2 1000.0
-s otr mtr 0.2 1000.0
-s otr mr 0.2 1000.0
-s obr mr 0.2 1000.0
-s obr mbr 0.2 1000.0
-s ob mbr 0.2 1000.0
-s ob mbl 0.2 1000.0
-s obl mbl 0.2 1000.0
-s obl ml 0.2 1000.0
-s otl ml 0.2 1000.0
-s otl mtl 0.2 1000.0
-
-#inner springs
-s mtl c 0.2 1200.0
-s mtr c 0.2 1200.0
-s mr c 0.2 1200.0
-s mbr c 0.2 1200.0
-s mbl c 0.2 1200.0
-s ml c 0.2 1200.0
-
+#capture device of type point_velocity, jack port name out_1 (the things in curly brackets are capture type dependant options)
 c point_velocity out_1 {
-	mbl (0.0, 0.0, 1.0) 0.002
+	bee (0.0, 1.0) 0.001 #monitor the point bee in the direction of the vector (0,1), gain of 0.001
 }
 
+#action of type move
 a move {
-	c (0, 0, 0.5)
+	bee (0.0, 1.0) #move point bee to (0,1) from where it is
 }

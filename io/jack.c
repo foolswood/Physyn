@@ -31,17 +31,14 @@ unsigned short create_audio_out(const char const *output_name) {
 	return n_outputs++;
 }
 
-
 static jack_port_t *midi_port = NULL;
 static jack_midi_event_t *midi_buffer = NULL;
 static short do_mevent = 0;
-static short (*midi_handler)(unsigned char*, size_t, void*) = NULL;
-static void *handler_data = NULL;
+static short (*midi_handler)(unsigned char*, size_t) = NULL;
 
-void create_midi_in(const char const *input_name, short (*mh)(unsigned char*, size_t, void*), void *hd) {
-	midi_port = jack_port_register(client, input_name, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
+void create_midi_in(short (*mh)(unsigned char*, size_t)) {
+	midi_port = jack_port_register(client, "in", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
 	midi_handler = mh;
-	handler_data = hd;
 }
 
 //void *create_audio_in(char *name) {
@@ -61,7 +58,7 @@ short pull_midi(void) {
 	short rcode;
 	if (do_mevent == 1) {
 		do_mevent = 0;
-		rcode = midi_handler((unsigned char*) midi_buffer->buffer, midi_buffer->size, handler_data);
+		rcode = midi_handler((unsigned char*) midi_buffer->buffer, midi_buffer->size);
 		return rcode;
 	}
 	return 0;

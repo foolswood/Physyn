@@ -14,7 +14,7 @@ static short midi_handler(unsigned char *event, size_t size) {
 	return 0;
 }
 
-void register_handler(handler_t handler, void *data) {
+void register_midi_handler(handler_t handler, void *data) {
 	//add a handler and its data to the arrays
 	void (*fptr)(short (*)(unsigned char*, size_t));
 	unsigned short n;

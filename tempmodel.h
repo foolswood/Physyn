@@ -6,7 +6,6 @@
 #include "springs.h"
 #include <string.h>
 #include <stdlib.h>
-#include "model.h"
 
 typedef struct temp_point {
 	char *pt_id;
@@ -47,6 +46,6 @@ unsigned int tree_items(temp_point *tree) ;
 
 unsigned int listlen(temp_spring *springlist) ;
 
-model convert(temp_point *tree, temp_spring *springlist) ;
+void convert(temp_point *tree, pointset *ps, temp_spring *springlist, springset *ss) ;
 
 #endif

@@ -22,11 +22,11 @@ inline void apply_spring(spring *s, vector v) {
 	Vtimes_scalar((s->b)->F[s->b_no], v, d);
 }
 
-void apply_springs(springset *s) {
+void apply_springs(springset s) {
 	static unsigned int i;
 	vector v = Vmk();
-	for (i=0; i<(s->no); i++) {
-		apply_spring((s->springs)+i, v);
+	for (i=0; i<(s.no); i++) {
+		apply_spring((s.springs)+i, v);
 	}
 	free(v);
 }

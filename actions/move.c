@@ -42,6 +42,6 @@ short setup_action(line_list *ll, temp_point *tree) {
 	md->x = tree->fast->x;
 	md->loc = pos;
 	//give data and functions to handler
-	register_handler(&on_midi, (void*) md);
+	register_midi_handler(&on_midi, (void*) md);
 	return 0; //do some error conditions
 }

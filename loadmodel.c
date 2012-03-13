@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include "model.h"
 #include "tempmodel.h"
 #include "readfile.h"
 #include "parsingfuncs.h"
@@ -130,37 +129,4 @@ unsigned int pts_sp(line_list *head, temp_point **tree, temp_spring **sp) { //re
 		head = head->next;
 	} while (head != NULL);
 	return no_nodes;
-}
-
-model fileload(char *path) {
-	model m;
-	temp_point *tree = NULL;
-	temp_spring *springs = NULL;
-	unsigned int no_nodes, no_springs;
-	line_list *ll = readfile(path); //read input file
-	get_dimensions(&ll);
-	no_nodes = pts_sp(ll, &tree, &springs); //initial pass for relationships
-	no_springs = listlen(springs);
-	if (no_springs && no_nodes) {
-		m = convert(tree, springs); //could make use of knowing springs and node numbers, since this works it out again
-	
-		// NASTY HACK FOR TESTING PURPOSES
-		init_actions(tree);
-		// END OF VILE HACK
-		
-		init_capture(tree);
-		listmunch(springs);
-		treemunch(tree);
-	}
-	else {
-		printf("%s\n", "no nodes or no springs defined");
-		treemunch(tree);
-		listmunch(springs);
-		m = mkmodel();
-		m.pts->no = 0;
-		m.pts->pts = NULL;
-		m.s->no = 0;
-		m.s->springs = NULL;
-	}
-	return m;
 }

@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -ggdb
 all : physyn plugins
 
-physyn : physyn.c action_queue.o actions.o capture.o charlist.o io.o linelist.o loadmodel.o midi.o model.o parsingfuncs.o points.o readfile.o springs.o tempmodel.o vectors.o loadmodel.h io.h springs.h points.h capture.h action_queue.h 
+physyn : physyn.c action_queue.o actions.o capture.o charlist.o io.o linelist.o loadmodel.o midi.o parsingfuncs.o points.o readfile.o springs.o tempmodel.o vectors.o loadmodel.h io.h springs.h points.h capture.h action_queue.h 
 	$(CC) $(CFLAGS) -rdynamic -lm -ldl  -ljack   physyn.c -o physyn *.o
 
 plugins : actions/move.so capture/point_velocity.so io/jack.so 
@@ -43,10 +43,10 @@ linelist.h : linelist.c charlist.h
 linelist.o : linelist.c charlist.h 
 	$(CC) $(CFLAGS) -c linelist.c
 
-loadmodel.h : loadmodel.c linelist.h model.h tempmodel.h readfile.h parsingfuncs.h capture.h actions.h 
+loadmodel.h : loadmodel.c linelist.h tempmodel.h readfile.h parsingfuncs.h capture.h actions.h 
 	./headergen.py loadmodel.c
 
-loadmodel.o : loadmodel.c linelist.h model.h tempmodel.h readfile.h parsingfuncs.h capture.h actions.h 
+loadmodel.o : loadmodel.c linelist.h tempmodel.h readfile.h parsingfuncs.h capture.h actions.h 
 	$(CC) $(CFLAGS) -c loadmodel.c
 
 midi.h : midi.c io.h 
@@ -54,12 +54,6 @@ midi.h : midi.c io.h
 
 midi.o : midi.c io.h 
 	$(CC) $(CFLAGS) -c midi.c
-
-model.h : model.c points.h springs.h 
-	./headergen.py model.c
-
-model.o : model.c points.h springs.h 
-	$(CC) $(CFLAGS) -c model.c
 
 parsingfuncs.h : parsingfuncs.c linelist.h charlist.h vectors.h 
 	./headergen.py parsingfuncs.c
@@ -85,10 +79,10 @@ springs.h : springs.c vectors.h points.h
 springs.o : springs.c vectors.h points.h 
 	$(CC) $(CFLAGS) -c springs.c
 
-tempmodel.h : tempmodel.c vectors.h points.h springs.h model.h 
+tempmodel.h : tempmodel.c vectors.h points.h springs.h 
 	./headergen.py tempmodel.c
 
-tempmodel.o : tempmodel.c vectors.h points.h springs.h model.h 
+tempmodel.o : tempmodel.c vectors.h points.h springs.h 
 	$(CC) $(CFLAGS) -c tempmodel.c
 
 vectors.h : vectors.c 

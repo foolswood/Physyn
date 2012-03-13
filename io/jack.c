@@ -67,6 +67,13 @@ short pull_midi(void) {
 //short pull_audio(void *voidptr) {
 //}
 
+short pull(void) {
+	if (midi_port != NULL)
+		if (pull_midi() == 0)
+			return 0;
+	return 1;
+}
+
 static int set_buffersize(jack_nframes_t nframes, void *voidptr) {
 	//Creates ringbuffers of the appropriate length (currently clears them)
 	unsigned short n;

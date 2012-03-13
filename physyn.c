@@ -6,17 +6,37 @@
 #include "action_queue.h"
 #include <stdio.h>
 
-//move load file functions to here
+springset ss;
+pointset ps;
 
-short rtloop(model m) {
+void fileload(char *path) {
+	temp_point *tree = NULL;
+	temp_spring *springs = NULL;
+	unsigned int no_points, no_springs;
+	line_list *ll = readfile(path); //read input file
+	get_dimensions(&ll);
+	no_points = pts_sp(ll, &tree, &springs); //initial pass for relationships
+	no_springs = listlen(springs);
+	if (no_springs && no_points) {
+		convert(tree, &ps, springs, &ss); //could make use of knowing springs and node numbers, since this works it out again
+		init_actions(tree);
+		init_capture(tree);
+	}
+	else
+		printf("%s\n", "no points or no springs defined");
+	treemunch(tree);
+	listmunch(springs);
+}
+
+short rtloop(void) {
 	static int i;
-	short (*pm)(void) = io_func("pull_midi");
+	short (*pull)(void) = io_func("pull");
 	for (i=0; i<10000000; i++) {
-		(*pm)();
+		(*pull)();
 		do_actions(ACT_START);
-		apply_springs(m.s);
+		apply_springs(ss);
 		do_actions(ACT_MIDDLE);
-		apply_forces(*(m.pts));
+		apply_forces(ps);
 		do_actions(ACT_END);
 		get_output();
 	}
@@ -24,7 +44,6 @@ short rtloop(model m) {
 }
 
 int main(void) {
-	model m;
 	unsigned int rate;
 	void (*io_go)(void);
 	//parse arguments
@@ -35,12 +54,13 @@ int main(void) {
 		return 1;
 	}
 	//load file
-	m = fileload("trial.pts");
+	fileload("trial.pts");
 	//prepare to simulate
 	io_go = io_func("go");
 	(*io_go)();
 	//simulate
-	rtloop(m);
+	rtloop();
+	//do an atexit() thing
 	//free everything
 	free_capture();
 	return 0;

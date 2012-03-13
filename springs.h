@@ -18,6 +18,6 @@ typedef struct springset {
 
 inline void apply_spring(spring *s, vector v) ;
 
-void apply_springs(springset *s) ;
+void apply_springs(springset s) ;
 
 #endif

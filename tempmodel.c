@@ -3,7 +3,6 @@
 #include "springs.h"
 #include <string.h>
 #include <stdlib.h>
-#include "model.h"
 
 typedef struct temp_point {
 	char *pt_id;
@@ -150,19 +149,18 @@ unsigned int listlen(temp_spring *springlist) {
 	return counter;
 }
 
-model convert(temp_point *tree, temp_spring *springlist) {
-	model m = mkmodel();
+void convert(temp_point *tree, pointset *ps, temp_spring *springlist, springset *ss) {
 	unsigned int s, i;
 	spring *sp;
 	s = tree_items(tree);
-	m.pts->no = s;
-	m.pts->pts = (point*) calloc(s, sizeof(point));
+	ps->no = s;
+	ps->pts = (point*) calloc(s, sizeof(point));
 	//traverse tree creating points
-	mk_fast_pts(tree, m.pts->pts, 0); //also fills the points array
+	mk_fast_pts(tree, ps->pts, 0); //also fills the points array
 	//create springs with links to those points
 	s = listlen(springlist);
-	m.s->no = s;
-	sp = m.s->springs = calloc(s, sizeof(spring));
+	ss->no = s;
+	sp = ss->springs = calloc(s, sizeof(spring));
 	for (i=0; i < s; i++) {
 		//move the important bits from the list to the array
 		(sp[i]).a = (springlist->a)->fast;
@@ -174,5 +172,4 @@ model convert(temp_point *tree, temp_spring *springlist) {
 		//advance through the list
 		springlist = springlist->next;
 	}
-	return m;
 }

@@ -4,6 +4,7 @@
 #include "points.h"
 #include "capture.h"
 #include "action_queue.h"
+#include "argparser.h"
 #include <stdio.h>
 
 springset ss;
@@ -14,6 +15,10 @@ void fileload(char *path) {
 	temp_spring *springs = NULL;
 	unsigned int no_points, no_springs;
 	line_list *ll = readfile(path); //read input file
+	if (ll == NULL) {
+		printf("file %s could not be accessed\n", path);
+		exit(1);
+	}
 	get_dimensions(&ll);
 	no_points = pts_sp(ll, &tree, &springs); //initial pass for relationships
 	no_springs = listlen(springs);
@@ -43,24 +48,29 @@ short rtloop(void) {
 	return 0;
 }
 
-int main(void) {
+int main(int argc, char **argv) {
 	unsigned int rate;
 	void (*io_go)(void);
+	args_t args;
 	//parse arguments
+	if (argparse(argc, argv, &args))
+		return 1;
 	//load IO
-	rate = load_io("jack"); //eventually cater for more
+	rate = load_io(args.io_module); //eventually cater for more
 	if ( rate == 0 ) {
 		printf("Exiting: Could Not Setup IO\n");
 		return 1;
 	}
+	//do an atexit
 	//load file
-	fileload("trial.pts");
+	fileload(args.fpath);
+	//do an atexit
 	//prepare to simulate
 	io_go = io_func("go");
+	//do an atexit
 	(*io_go)();
 	//simulate
 	rtloop();
-	//do an atexit() thing
 	//free everything
 	free_capture();
 	return 0;

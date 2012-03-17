@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -ggdb
 all : physyn plugins
 
-physyn : physyn.c action_queue.o actions.o capture.o charlist.o io.o linelist.o loadmodel.o midi.o parsingfuncs.o points.o readfile.o springs.o tempmodel.o vectors.o loadmodel.h io.h springs.h points.h capture.h action_queue.h 
+physyn : physyn.c action_queue.o actions.o argparser.o capture.o charlist.o io.o linelist.o loadmodel.o midi.o parsingfuncs.o points.o readfile.o springs.o tempmodel.o vectors.o loadmodel.h io.h springs.h points.h capture.h action_queue.h argparser.h 
 	$(CC) $(CFLAGS) -rdynamic -lm -ldl  -ljack   physyn.c -o physyn *.o
 
 plugins : actions/move.so capture/point_velocity.so io/jack.so 
@@ -18,6 +18,12 @@ actions.h : actions.c action_queue.h linelist.h tempmodel.h parsingfuncs.h
 
 actions.o : actions.c action_queue.h linelist.h tempmodel.h parsingfuncs.h 
 	$(CC) $(CFLAGS) -c actions.c
+
+argparser.h : argparser.c 
+	./headergen.py argparser.c
+
+argparser.o : argparser.c 
+	$(CC) $(CFLAGS) -c argparser.c
 
 capture.h : capture.c tempmodel.h linelist.h io.h 
 	./headergen.py capture.c

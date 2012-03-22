@@ -30,6 +30,8 @@ float Vdot(const vector const a, const vector const b) ;
 
 float Vmodulus(const vector const a) ;
 
+/* Useful for testing components
 void Vprint(const vector const a) ;
+*/
 
 #endif

@@ -79,6 +79,7 @@ float Vmodulus(const vector const a) {
 	return sqrt(sum);
 }
 
+/* Useful for testing components
 void Vprint(const vector const a) {
 	unsigned short d;
 	for (d = 0; d < dimensions; d++) {
@@ -86,3 +87,4 @@ void Vprint(const vector const a) {
 	}
 	printf("\n");
 }
+*/

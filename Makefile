@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -ggdb
 all : physyn plugins
 
-physyn : physyn.c action_queue.o actions.o argparser.o capture.o charlist.o io.o linelist.o loadmodel.o midi.o parsingfuncs.o points.o readfile.o springs.o tempmodel.o vectors.o loadmodel.h io.h springs.h points.h capture.h action_queue.h argparser.h 
+physyn : physyn.c action_queue.o actions.o argparser.o capture.o charlist.o io.o linelist.o loadmodel.o midi.o midi_helpers.o parsingfuncs.o points.o readfile.o springs.o tempmodel.o vectors.o loadmodel.h io.h springs.h points.h capture.h action_queue.h argparser.h 
 	$(CC) $(CFLAGS) -rdynamic -lm -ldl  -ljack   physyn.c -o physyn *.o
 
 plugins : actions/move.so capture/point_velocity.so io/jack.so 
@@ -61,6 +61,12 @@ midi.h : midi.c io.h
 midi.o : midi.c io.h 
 	$(CC) $(CFLAGS) -c midi.c
 
+midi_helpers.h : midi_helpers.c 
+	./headergen.py midi_helpers.c
+
+midi_helpers.o : midi_helpers.c 
+	$(CC) $(CFLAGS) -c midi_helpers.c
+
 parsingfuncs.h : parsingfuncs.c linelist.h charlist.h vectors.h 
 	./headergen.py parsingfuncs.c
 
@@ -97,7 +103,7 @@ vectors.h : vectors.c
 vectors.o : vectors.c 
 	$(CC) $(CFLAGS) -c vectors.c
 
-actions/move.so : actions/move.c action_queue.h linelist.h tempmodel.h parsingfuncs.h vectors.h midi.h 
+actions/move.so : actions/move.c action_queue.h linelist.h tempmodel.h parsingfuncs.h vectors.h midi.h midi_helpers.h 
 	$(CC) $(CFLAGS) -fpic -c actions/move.c -o actions/move.o
 	gcc -shared -Wl,-soname,actions/move.so -o actions/move.so actions/move.o
 

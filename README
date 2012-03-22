@@ -4,8 +4,7 @@ License - GPL v3
 
 Requires libjack library and headers to compile, and a running jack server when it is launched.
 
-Just type make to build (for some reason -j n options make it not build, a better build system will be put in at some point).
-This currently only operates on trial.pts, this will not remain the behaviour, it was for testing of a new feature.
+Usage is: physyn modelfile.pts
 
 The headergen.py script is for generating the headers (surprisingly), and is intended for use by developers, the included ones should work.
 

@@ -4,6 +4,7 @@
 #include "../parsingfuncs.h"
 #include "../vectors.h"
 #include "../midi.h"
+#include "../midi_helpers.h"
 
 //Test Action (move) - Should be a dynamic loaded module
 
@@ -24,7 +25,17 @@ void action_free_data(void *data) {
 }
 
 short on_midi(unsigned char* buffer, size_t size, void *data) {
-	add_action(ACT_START, &do_action, data, NULL);
+	move_data *d, *md;
+	midi_channel_event_t *event;
+	event = buffer; //MAKE EVENT STRUCT WORK OR DROP IT
+	if (*buffer == NOTE_ON_EVENT) {
+		md = malloc(sizeof(move_data));
+		d = (move_data*) data;
+		md->x = d->x;
+		md->loc = Vmk();
+		Vtimes_scalar(md->loc, d->loc, (event->arg2 + 1)/128.0);
+		add_action(ACT_START, &do_action, (void*) md, action_free_data);
+	}
 	return 0;
 }
 

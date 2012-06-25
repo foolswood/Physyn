@@ -137,7 +137,4 @@ void go(void) {
 	jack_set_buffer_size_callback(client, set_buffersize, NULL);
 	jack_set_process_callback(client, process, NULL);
 	jack_activate(client);
-	//autoconnect ports
-	jack_connect(client, "physyn:out_1", "system:playback_1");
-	jack_connect(client, "physyn:out_1", "system:playback_2");
 }

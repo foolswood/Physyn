@@ -26,14 +26,14 @@ void action_free_data(void *data) {
 
 short on_midi(unsigned char* buffer, size_t size, void *data) {
 	move_data *d, *md;
-	midi_channel_event_t *event;
-	event = buffer; //MAKE EVENT STRUCT WORK OR DROP IT
-	if (*buffer == NOTE_ON_EVENT) {
+	unsigned short velocity;
+	if ((MIDI_EVENT & buffer[0]) == MIDI_NOTE_ON) {
+		velocity = buffer[2];
 		md = malloc(sizeof(move_data));
 		d = (move_data*) data;
 		md->x = d->x;
 		md->loc = Vmk();
-		Vtimes_scalar(md->loc, d->loc, (event->arg2 + 1)/128.0);
+		Vtimes_scalar(md->loc, d->loc, (velocity + 1)/128.0);
 		add_action(ACT_START, &do_action, (void*) md, action_free_data);
 	}
 	return 0;

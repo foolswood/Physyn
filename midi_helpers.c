@@ -1,19 +1,17 @@
 #include <stdlib.h>
 
-#define NOTE_ON_EVENT 0x90
-#define NOTE_OFF_EVENT 0x80
-#define NOTE_AFTERTOUCH_EVENT 0xA0
-#define CONTROLLER_EVENT 0xB0
-#define PROGRAM_CHANGE_EVENT 0xC0
-#define CHANNEL_AFTERTOUCH_EVENT 0xD0
-#define PITCH_BEND_EVENT 0xE0
+//Event and channel bitmasks
+#define MIDI_EVENT 0xF0
+#define MIDI_CHANNEL 0x0F
 
-typedef struct midi_channel_event_t {
-	unsigned type:4;
-	unsigned channel:4;
-	unsigned arg1:8;
-	unsigned arg2:8;
-} midi_channel_event_t;
+//Event types
+#define MIDI_NOTE_ON 0x90
+#define MIDI_NOTE_OFF 0x80
+#define MIDI_NOTE_AFTERTOUCH 0xA0
+#define MIDI_CONTROLLER 0xB0
+#define MIDI_PROGRAM_CHANGE 0xC0
+#define MIDI_CHANNEL_AFTERTOUCH 0xD0
+#define MIDI_PITCH_BEND 0xE0
 
 unsigned short note_id(char *note_id) {
 	//Bulletproof me
